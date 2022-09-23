@@ -8,7 +8,7 @@ import {
 
 function* increaseSaga(action: PayloadAction<number>) {
   yield put(incrementSaga());
-  yield put(incrementSagaSuccess(action.payload));
+  yield put(incrementSagaSuccess(1));
 }
 
 export default function* counterSaga() {

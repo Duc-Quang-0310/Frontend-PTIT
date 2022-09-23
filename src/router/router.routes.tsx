@@ -6,7 +6,7 @@ import { routerPaths } from './router.paths';
 // ACHIEVE: Lazy loading to reduce compiler run time size
 const Home = lazy(() => import('../pages/Home/Home'));
 
-export const ListRouter: RouterInterface[] = [
+export const listRouters: RouterInterface[] = [
   {
     component: (
       <SuspenseComp>
