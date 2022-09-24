@@ -121,11 +121,11 @@ const SelectUI = forwardRef<any, SelectProps>((props, ref) => {
       }
       if (Array.isArray(value)) {
         const newValue = [...value].map((each) => {
-          if (each?.label === option.label) {
+          if (each?.label === option?.label) {
             return {
               ...each,
               value: currentValue,
-              label: option.label
+              label: option?.label
             };
           }
           return each;
@@ -165,6 +165,7 @@ const SelectUI = forwardRef<any, SelectProps>((props, ref) => {
         loading={loading}
         style={stylesAttribute}
         status={statusMemo}
+        defaultValue={value}
         {...other}
       />
       {isRequired && !selectedValue && (

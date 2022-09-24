@@ -1,7 +1,5 @@
-import { useState } from 'react';
-
 const Home = () => {
-  return <div></div>;
+  return <div>no</div>;
 };
 
 export default Home;
