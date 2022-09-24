@@ -1,5 +1,5 @@
 import { Spin } from 'antd';
-import { FC, Suspense } from 'react';
+import { FC, ReactNode, Suspense } from 'react';
 import styled from 'styled-components';
 
 const LoadingLayout = styled.div`
@@ -9,7 +9,7 @@ const LoadingLayout = styled.div`
   align-items: center;
 `;
 
-const SuspenseComp: FC = (props: any) => {
+const SuspenseComp: FC<{ child: ReactNode }> = (props) => {
   return (
     <Suspense
       fallback={
@@ -18,7 +18,7 @@ const SuspenseComp: FC = (props: any) => {
         </LoadingLayout>
       }
     >
-      {props.children}
+      {props.child}
     </Suspense>
   );
 };
