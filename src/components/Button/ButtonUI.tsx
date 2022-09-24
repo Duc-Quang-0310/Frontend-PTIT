@@ -6,15 +6,16 @@ import {
   useId,
   forwardRef,
   memo,
-} from "react";
-import Button from "antd/es/button";
-import { BaseButtonProps } from "antd/es/button/button";
-import LoadingOutlined from "@ant-design/icons/lib/icons/LoadingOutlined";
+  CSSProperties
+} from 'react';
+import Button from 'antd/es/button';
+import { BaseButtonProps } from 'antd/es/button/button';
+import LoadingOutlined from '@ant-design/icons/lib/icons/LoadingOutlined';
 import {
   LoadingContainer,
   PrefixContainer,
-  SuffixContainer,
-} from "./Button.style";
+  SuffixContainer
+} from './Button.style';
 
 interface ButtonProps extends BaseButtonProps {
   content: string | ReactNode;
@@ -25,6 +26,7 @@ interface ButtonProps extends BaseButtonProps {
   loadingClassName?: string;
   hideBtn?: boolean;
   unSeenBtn?: boolean;
+  colorFill?: string;
 }
 
 const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
@@ -40,6 +42,7 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
     type,
     hideBtn,
     unSeenBtn,
+    colorFill,
     ...other
   } = props;
   const btnId = useId();
@@ -55,9 +58,13 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
     <Button
       {...other}
       disabled={loading as boolean}
-      type={type || "primary"}
+      type={type || 'primary'}
       ref={ref}
       key={`antd-btn-${btnId}`}
+      style={{
+        background: colorFill,
+        borderColor: colorFill
+      }}
     >
       {loading ? (
         <LoadingContainer key={`loading-${btnId}`}>
@@ -79,5 +86,5 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
   );
 });
 
-ButtonUI.displayName = "Button";
+ButtonUI.displayName = 'Button';
 export default memo(ButtonUI);
