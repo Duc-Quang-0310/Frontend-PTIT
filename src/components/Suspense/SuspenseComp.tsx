@@ -1,6 +1,6 @@
-import { Spin } from "antd";
-import { Suspense } from "react";
-import styled from "styled-components";
+import { Spin } from 'antd';
+import { FC, Suspense } from 'react';
+import styled from 'styled-components';
 
 const LoadingLayout = styled.div`
   height: 100%;
@@ -9,7 +9,7 @@ const LoadingLayout = styled.div`
   align-items: center;
 `;
 
-const SuspenseComp = (props: any) => {
+const SuspenseComp: FC = (props: any) => {
   return (
     <Suspense
       fallback={
