@@ -1,17 +1,18 @@
-import { lazy } from "react";
-import SuspenseComp from "../components/Suspense/SuspenseComp";
-import { RouterInterface, RouterPath } from "./routerPath.routes";
+import { lazy } from 'react';
+import SuspenseComp from '../components/Suspense/SuspenseComp';
+import { RouterInterface } from 'types/router.model';
+import { routerPaths } from './router.paths';
 
 // ACHIEVE: Lazy loading to reduce compiler run time size
-const Home = lazy(() => import("../pages/Home/Home"));
+const Home = lazy(() => import('../pages/Home/Home'));
 
-export const ListRouter: RouterInterface[] = [
+export const listRouters: RouterInterface[] = [
   {
     component: (
       <SuspenseComp>
         <Home />
       </SuspenseComp>
     ),
-    path: RouterPath.HOME,
-  },
+    path: routerPaths.HOME
+  }
 ];

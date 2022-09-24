@@ -1,15 +1,22 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./index.css";
-import "antd/dist/antd.min.css";
-import { ConfigProvider } from "antd";
-import VietNam from "antd/lib/locale/vi_VN";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ConfigProvider } from 'antd';
+import VietNam from 'antd/lib/locale/vi_VN';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import 'antd/dist/antd.min.css';
+import App from './App';
+import { persistor, store } from 'global/store';
+import './index.css';
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ConfigProvider locale={VietNam}>
-      <App />
-    </ConfigProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ConfigProvider locale={VietNam}>
+          <App />
+        </ConfigProvider>
+      </PersistGate>
+    </Provider>
   </React.StrictMode>
 );
