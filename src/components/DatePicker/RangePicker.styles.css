@@ -1,0 +1,18 @@
+.ant-picker-panels .ant-picker-panel:last-child .ant-picker-header-view {
+  display: none;
+}
+
+.ant-picker-panels .ant-picker-panel:last-child .ant-picker-header {
+  position: relative;
+  left: -105px;
+  width: fit-content;
+}
+
+.ant-picker-panels .ant-picker-panel:last-child {
+  width: 0;
+}
+
+.ant-picker-ranges {
+  display: flex;
+  justify-content: center;
+}
