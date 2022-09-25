@@ -8,11 +8,7 @@ const Home = lazy(() => import('../pages/Home/Home'));
 
 export const listRouters: RouterInterface[] = [
   {
-    component: (
-      <SuspenseComp>
-        <Home />
-      </SuspenseComp>
-    ),
+    component: <SuspenseComp child={<Home />} />,
     path: routerPaths.HOME
   }
 ];
