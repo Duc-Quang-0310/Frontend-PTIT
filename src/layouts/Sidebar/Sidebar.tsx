@@ -1,10 +1,12 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import Toggler from 'components/Toggler/Toggler';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Content, Resizer, SidebarWrapper } from './Sidebar.style';
 
 const Sidebar: FC = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(150);
+  const [sidebarWidth, setSidebarWidth] = useState(100);
+  const [toggle, setToggle] = useState(false);
 
   const startResizing = useCallback(() => {
     setIsResizing(true);
@@ -32,9 +34,30 @@ const Sidebar: FC = () => {
     };
   }, [resize, stopResizing]);
 
+  useEffect(() => {
+    if (toggle) {
+      setSidebarWidth(120);
+    } else {
+      setSidebarWidth(70);
+    }
+  }, [toggle]);
+
   return (
-    <SidebarWrapper itemProp={String(sidebarWidth)} ref={sidebarRef}>
-      <Content>Dark side</Content>
+    <SidebarWrapper
+      itemProp={String(sidebarWidth)}
+      ref={sidebarRef}
+      itemRef={String(isResizing)}
+    >
+      <Content>
+        {!isResizing && (
+          <Toggler
+            isOpen={toggle}
+            setIsOpen={setToggle}
+            position={{ top: 10, right: -15 }}
+          />
+        )}
+        Dark side
+      </Content>
       <Resizer onMouseDown={startResizing} />
     </SidebarWrapper>
   );

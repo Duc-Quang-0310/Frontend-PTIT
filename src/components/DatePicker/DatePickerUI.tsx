@@ -11,7 +11,7 @@ interface DatePickerProps extends PickerDateProps<Moment> {
 }
 
 const DatePickerUI = forwardRef<any, DatePickerProps>((props, ref) => {
-  const { dateType = 'default', showTimeSelect, ...other } = props;
+  const { dateType = 'default', showTimeSelect, style, ...other } = props;
   const uniqueID = useId();
 
   return (
@@ -22,6 +22,7 @@ const DatePickerUI = forwardRef<any, DatePickerProps>((props, ref) => {
           defaultValue: moment('00:00:00', 'HH:mm:ss')
         }
       }
+      style={{ borderRadius: '5px', ...style }}
       format={showTimeSelect ? 'DD/MM/YYYY HH:mm:ss' : 'DD/MM/YYYY'}
       disabledDate={(currentDate) => checkDisabledDate(currentDate, dateType)}
       ref={ref}
