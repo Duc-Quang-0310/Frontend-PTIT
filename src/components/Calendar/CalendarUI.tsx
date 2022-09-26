@@ -9,7 +9,8 @@ import './Calendar.styles.css';
 interface CalendarProps extends AntDCalendarProps<Moment> {}
 
 const CalendarUI: FC<CalendarProps> = (props) => {
-  const [selectedValue, setSelectedValue] = useState(moment());
+  const { defaultValue = moment(), ...other } = props;
+  const [selectedValue, setSelectedValue] = useState(defaultValue);
 
   const onSelect = (currenDate: Moment) => {
     setSelectedValue(currenDate);
@@ -19,6 +20,7 @@ const CalendarUI: FC<CalendarProps> = (props) => {
     if (currenDate) setSelectedValue(currenDate);
   };
 
+  // Wrap inside useCallBack
   const customizeHeader = (
     value: moment.Moment,
     onChange: (date: moment.Moment) => void
@@ -30,11 +32,17 @@ const CalendarUI: FC<CalendarProps> = (props) => {
     const localeData = value.localeData();
     const months = [];
 
+    // use map instead of common loop
+    /**
+     * @Array [1,2,3,4,...12].forEach(each=> ...)
+     */
+
     for (let i = 0; i < 12; i++) {
       current.month(i);
       months.push(localeData.monthsShort(current));
     }
 
+    // use map instead of common loop
     for (let i = start; i < end; i++) {
       monthOptions.push(
         <Select.Option key={i} value={i} className="month-item">
@@ -43,6 +51,7 @@ const CalendarUI: FC<CalendarProps> = (props) => {
       );
     }
 
+    // const to top
     const month = value.month();
 
     return (
@@ -95,7 +104,7 @@ const CalendarUI: FC<CalendarProps> = (props) => {
             })
           }
         }}
-        {...props}
+        {...other}
       />
     </>
   );
