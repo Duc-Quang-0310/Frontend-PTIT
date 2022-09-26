@@ -1,0 +1,16 @@
+.ant-picker-calendar-header .ant-picker-calendar-year-select {
+  display: none;
+}
+
+.ant-picker-calendar-header .ant-radio-group-outline {
+  display: none;
+}
+
+.ant-alert-info.ant-alert-no-icon {
+  margin-inline: 0.25rem;
+}
+
+.ant-alert-info.ant-alert-no-icon .ant-alert-message {
+  display: flex;
+  justify-content: center;
+}
