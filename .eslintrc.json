@@ -131,7 +131,8 @@
     "react/button-has-type": "off",
     "no-unused-expressions": "off",
     "arrow-body-style": "off",
-    "react/require-default-props": "off"
+    "react/require-default-props": "off",
+    "react/no-unstable-nested-components": "off"
   },
   "settings": {
     "import/extensions": [".js", ".jsx", ".ts", ".tsx"],

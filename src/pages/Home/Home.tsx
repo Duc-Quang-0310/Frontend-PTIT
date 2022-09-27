@@ -1,5 +1,11 @@
+import CalendarUI from 'components/Calendar/CalendarUI';
+
 const Home = () => {
-  return <div>Home</div>;
+  return (
+    <div>
+      <CalendarUI />
+    </div>
+  );
 };
 
 export default Home;
