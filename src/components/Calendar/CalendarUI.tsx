@@ -1,11 +1,11 @@
-import moment, { Moment } from 'moment';
-import { FC, memo, useState } from 'react';
+import { Moment } from 'moment';
+import { FC, memo, useCallback, useId, useState } from 'react';
 import { CalendarProps as AntDCalendarProps } from 'antd/lib/calendar';
 import { Alert, Calendar, Col, Row, Select } from 'antd';
+import moment from 'helpers/moment';
 import DatePickerUI from 'components/DatePicker/DatePickerUI';
 import { CalenderHeader } from './Calendar.styled';
 import './Calendar.styles.css';
-import 'helpers/moment';
 
 interface CalendarProps extends AntDCalendarProps<Moment> {}
 
@@ -13,64 +13,62 @@ const CalendarUI: FC<CalendarProps> = (props) => {
   const { defaultValue = moment(), ...other } = props;
   const [selectedValue, setSelectedValue] = useState(defaultValue);
 
-  const onSelect = (currenDate: Moment) => {
+  const uniqueKey = useId();
+
+  const handleSelectDay = (currenDate: Moment) => {
     setSelectedValue(currenDate);
   };
 
-  const handleChangeDatePicker = (currenDate: Moment | null) => {
+  const handleChangeDatePicker = useCallback((currenDate: Moment | null) => {
     if (currenDate) setSelectedValue(currenDate);
-  };
+  }, []);
 
-  // Wrap inside useCallBack
-  const customizeHeader = (
-    value: moment.Moment,
-    onChange: (date: moment.Moment) => void
-  ) => {
-    const start = 0;
-    const end = 12;
-    const monthOptions = [];
-    const current = value.clone();
-    const localeData = value.localeData();
-    const months = [];
-    const month = value.month();
+  const customizeHeader = useCallback(
+    (value: moment.Moment, onChange: (date: moment.Moment) => void) => {
+      const monthIndex = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+      const monthOptions: JSX.Element[] = [];
+      const current = value.clone();
+      const localeData = value.localeData();
+      const month = value.month();
 
-    for (let i = 0; i < 12; i++) {
-      current.month(i);
-      months.push(localeData.monthsShort(current));
-    }
+      monthIndex.forEach((item) => {
+        current.month(item);
+        const currenMonth = localeData.monthsShort(current);
+        monthOptions.push(
+          <Select.Option key={item} value={item}>
+            {currenMonth}
+          </Select.Option>
+        );
+      });
 
-    for (let i = start; i < end; i++) {
-      monthOptions.push(
-        <Select.Option key={i} value={i}>
-          {months[i]}
-        </Select.Option>
+      const handleChangeMonthSelect = (newMonth: number) => {
+        const now = value.clone().month(newMonth);
+        onChange(now);
+      };
+
+      return (
+        <CalenderHeader>
+          <DatePickerUI
+            allowClear={false}
+            value={selectedValue}
+            onChange={handleChangeDatePicker}
+          />
+          <Row gutter={8}>
+            <Col>
+              <Select
+                dropdownMatchSelectWidth={false}
+                value={month}
+                onChange={handleChangeMonthSelect}
+              >
+                {monthOptions}
+              </Select>
+            </Col>
+          </Row>
+        </CalenderHeader>
       );
-    }
-
-    return (
-      <CalenderHeader>
-        <DatePickerUI
-          allowClear={false}
-          value={selectedValue}
-          onChange={handleChangeDatePicker}
-        />
-        <Row gutter={8}>
-          <Col>
-            <Select
-              dropdownMatchSelectWidth={false}
-              value={month}
-              onChange={(newMonth) => {
-                const now = value.clone().month(newMonth);
-                onChange(now);
-              }}
-            >
-              {monthOptions}
-            </Select>
-          </Col>
-        </Row>
-      </CalenderHeader>
-    );
-  };
+    },
+    [handleChangeDatePicker, selectedValue]
+  );
 
   return (
     <>
@@ -78,9 +76,10 @@ const CalendarUI: FC<CalendarProps> = (props) => {
         message={`Bạn đã chọn ngày: ${selectedValue.format('DD/MM/YYYY')}`}
       />
       <Calendar
+        key={uniqueKey}
         headerRender={({ value, onChange }) => customizeHeader(value, onChange)}
         value={selectedValue}
-        onSelect={onSelect}
+        onSelect={handleSelectDay}
         {...other}
       />
     </>
