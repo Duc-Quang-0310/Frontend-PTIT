@@ -5,6 +5,7 @@ import { Alert, Calendar, Col, Row, Select } from 'antd';
 import DatePickerUI from 'components/DatePicker/DatePickerUI';
 import { CalenderHeader } from './Calendar.styled';
 import './Calendar.styles.css';
+import 'helpers/moment';
 
 interface CalendarProps extends AntDCalendarProps<Moment> {}
 
@@ -31,28 +32,20 @@ const CalendarUI: FC<CalendarProps> = (props) => {
     const current = value.clone();
     const localeData = value.localeData();
     const months = [];
-
-    // use map instead of common loop
-    /**
-     * @Array [1,2,3,4,...12].forEach(each=> ...)
-     */
+    const month = value.month();
 
     for (let i = 0; i < 12; i++) {
       current.month(i);
       months.push(localeData.monthsShort(current));
     }
 
-    // use map instead of common loop
     for (let i = start; i < end; i++) {
       monthOptions.push(
-        <Select.Option key={i} value={i} className="month-item">
+        <Select.Option key={i} value={i}>
           {months[i]}
         </Select.Option>
       );
     }
-
-    // const to top
-    const month = value.month();
 
     return (
       <CalenderHeader>
@@ -88,22 +81,6 @@ const CalendarUI: FC<CalendarProps> = (props) => {
         headerRender={({ value, onChange }) => customizeHeader(value, onChange)}
         value={selectedValue}
         onSelect={onSelect}
-        locale={{
-          lang: {
-            locale: 'vi',
-            dayFormat: moment.updateLocale('vi', {
-              weekdaysMin: [
-                'Chủ nhật',
-                'Thứ 2',
-                'Thứ 3',
-                'Thứ 4',
-                'Thứ 5',
-                'Thứ 6',
-                'Thứ 7'
-              ]
-            })
-          }
-        }}
         {...other}
       />
     </>
