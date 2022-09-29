@@ -9,17 +9,17 @@ import {
   useEffect,
   useId
 } from 'react';
+import './ModalUI.style.css';
+import cn from 'classnames';
+import { CloseOutlined } from '@ant-design/icons';
+import { renderColorByType } from 'helpers/color';
+import { ColorPalette } from 'constants/style.constant';
 import {
   CloseIconContainer,
   ModalContentDefaultContainer,
   ModalFooterDefaultContainer,
   ModalHeaderDefaultContainer
 } from './ModalUI.style';
-import './ModalUI.style.css';
-import cn from 'classnames';
-import { CloseOutlined } from '@ant-design/icons';
-import { renderColorByType } from 'helpers/color';
-import { ColorPalette } from 'constants/style.constant';
 
 interface ModalProps extends AntdModalProps {
   modalTitle: string;
@@ -27,7 +27,7 @@ interface ModalProps extends AntdModalProps {
   onCancel?: () => void;
   content?: ReactNode;
   modalType?: 'normal' | 'confirmAction';
-  modalColorType?: 'info' | 'success' | 'warning';
+  modalColorType?: 'info' | 'success' | 'warning' | 'purple';
   abortEsc?: boolean;
 }
 
@@ -86,11 +86,15 @@ const ModalUI: FC<ModalProps> = (props) => {
 
     return (
       <ModalFooterDefaultContainer>
-        <ButtonUI content="Đóng" type="default" onClick={() => onProceed?.()} />
+        <ButtonUI
+          content="Đóng"
+          type="default"
+          onClick={() => cancelAction()}
+        />
         <ButtonUI
           content="Xác nhận"
           colorFill={renderColorByType(modalColorType)}
-          onClick={() => cancelAction()}
+          onClick={() => onProceed?.()}
         />
       </ModalFooterDefaultContainer>
     );

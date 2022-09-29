@@ -10,7 +10,7 @@ import {
 interface InputProps extends AntdInputProps {
   name: string;
   handleOnChange?: (value: string) => void;
-  label: string;
+  label?: string;
   containerClassName?: string;
 }
 
@@ -35,9 +35,11 @@ const InputUI = forwardRef<any, InputProps>((props, ref) => {
 
   return (
     <DefaultContainerInput className={containerClassName} key={uniqueKey}>
-      <LabelWrapper>
-        {required && <RequireText>*</RequireText>} {label}
-      </LabelWrapper>
+      {label && (
+        <LabelWrapper>
+          {required && <RequireText>*</RequireText>} {label}
+        </LabelWrapper>
+      )}
       <Input
         name={name}
         ref={ref}
