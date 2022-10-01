@@ -19,6 +19,7 @@ import {
   useState
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserActionModalType } from 'constants/user.constants';
 import {
   CursorPointer,
   HeaderContainer,
@@ -26,14 +27,6 @@ import {
   ListIconWrapper
 } from './Header.style';
 import './Header.style.css';
-
-enum UserActionModalType {
-  LOG_IN = 'Log-in',
-  LOG_OUT = 'log-out',
-  NEW_ACCOUNT = 'sign-up',
-  NONE = 'none',
-  PW_RECOVER = 'pw-recover'
-}
 
 const Header: FC = () => {
   const uniqueKey = useId();

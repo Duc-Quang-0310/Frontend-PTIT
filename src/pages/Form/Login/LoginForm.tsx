@@ -61,7 +61,6 @@ const LoginForm: FC = () => {
       if (rememberMeWatch) {
         // TODO: handle with true case
       }
-      console.log('🚀 ~ file: LoginForm.tsx ~ line 60 ~ value', value);
     },
     [clearErrors, rememberMeWatch]
   );
@@ -70,11 +69,7 @@ const LoginForm: FC = () => {
     if (errors) {
       const [firstFoundError, ...otherErrors] = Object.entries(errors);
       if (firstFoundError) {
-        console.log(
-          '🚀 ~ file: LoginForm.tsx ~ line 72 ~ useEffect ~ otherErrors',
-          otherErrors
-        );
-        setFocus(firstFoundError?.[0]);
+        setFocus(firstFoundError[0]);
       }
     }
   }, [errors, setFocus]);
@@ -103,24 +98,20 @@ const LoginForm: FC = () => {
           <Controller
             control={control}
             name="email"
-            render={({ field: { value, onChange, ref } }) => {
-              return (
-                <InputUI
-                  ref={ref}
-                  placeholder="Email"
-                  style={{ borderRadius: 8, paddingBlock: 10, paddingLeft: 15 }}
-                  suffix={<MailOutlined />}
-                  onChange={onChange}
-                  value={value}
-                />
-              );
-            }}
+            render={({ field: { value, onChange, ref } }) => (
+              <InputUI
+                ref={ref}
+                name="email"
+                placeholder="Email"
+                style={{ borderRadius: 8, paddingBlock: 10, paddingLeft: 15 }}
+                suffix={<MailOutlined />}
+                onChange={onChange}
+                value={value}
+                errors={errors}
+                errTextStyle={{ paddingInline: 12 }}
+              />
+            )}
           />
-          {errors && errors?.email && (
-            <div style={{ paddingInline: 12 }} className="error-text">
-              {String(errors?.email?.message)}
-            </div>
-          )}
         </div>
         <div>
           <Controller
@@ -129,20 +120,18 @@ const LoginForm: FC = () => {
             render={({ field: { value, onChange, ref } }) => (
               <InputUI
                 ref={ref}
+                name="password"
                 placeholder="Mật khẩu"
                 type={!toggleSeePW ? 'password' : 'text'}
                 style={{ borderRadius: 8, paddingBlock: 10, paddingLeft: 15 }}
                 suffix={renderSuffixPassword}
                 onChange={onChange}
                 value={value}
+                errors={errors}
+                errTextStyle={{ paddingInline: 12 }}
               />
             )}
           />
-          {errors && errors?.password && (
-            <div style={{ paddingInline: 12 }} className="error-text">
-              {String(errors?.password?.message)}
-            </div>
-          )}
         </div>
         <FlexBetween style={{ paddingInline: 10 }}>
           <Controller
