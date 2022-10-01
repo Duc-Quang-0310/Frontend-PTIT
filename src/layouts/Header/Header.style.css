@@ -1,0 +1,13 @@
+.icon-wrapper:hover {
+    background-color: #7F56D9;
+   
+}
+
+.icon-wrapper:hover svg path {
+    stroke: #fff;
+}
+
+.ant-popover-inner-content {
+    padding: 0 !important;
+}
+

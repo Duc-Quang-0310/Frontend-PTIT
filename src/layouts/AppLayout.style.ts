@@ -5,7 +5,7 @@ export const AppLayoutWrapper = styled.div`
 `;
 
 export const ContentWrapper = styled.div`
-  height: calc(100vh - 50px);
+  height: calc(100vh - 70px);
   display: flex;
   flex-direction: row;
 `;
