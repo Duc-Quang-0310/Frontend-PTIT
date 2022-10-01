@@ -27,6 +27,7 @@ interface ButtonProps extends BaseButtonProps {
   hideBtn?: boolean;
   unSeenBtn?: boolean;
   colorFill?: string;
+  style?: CSSProperties;
 }
 
 const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
@@ -43,6 +44,8 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
     hideBtn,
     unSeenBtn,
     colorFill,
+    style,
+
     ...other
   } = props;
   const btnId = useId();
@@ -63,7 +66,8 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
       key={`antd-btn-${btnId}`}
       style={{
         background: colorFill,
-        borderColor: colorFill
+        borderColor: colorFill,
+        ...style
       }}
     >
       {loading ? (

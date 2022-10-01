@@ -16,6 +16,7 @@ import { renderColorByType } from 'helpers/color';
 import { ColorPalette } from 'constants/style.constant';
 import {
   CloseIconContainer,
+  CloseVisibleOnlyContainer,
   ModalContentDefaultContainer,
   ModalFooterDefaultContainer,
   ModalHeaderDefaultContainer
@@ -29,6 +30,8 @@ interface ModalProps extends AntdModalProps {
   modalType?: 'normal' | 'confirmAction';
   modalColorType?: 'info' | 'success' | 'warning' | 'purple';
   abortEsc?: boolean;
+  confirmText?: string;
+  notDisplayTitle?: boolean;
 }
 
 const DetectEsc: FC<{ close: () => void }> = ({ close }) => {
@@ -58,6 +61,8 @@ const ModalUI: FC<ModalProps> = (props) => {
     modalType = 'normal',
     modalColorType = 'success',
     abortEsc = false,
+    confirmText,
+    notDisplayTitle = false,
     ...other
   } = props;
 
@@ -92,28 +97,40 @@ const ModalUI: FC<ModalProps> = (props) => {
           onClick={() => cancelAction()}
         />
         <ButtonUI
-          content="Xác nhận"
+          content={confirmText || 'Xác nhận'}
           colorFill={renderColorByType(modalColorType)}
           onClick={() => onProceed?.()}
         />
       </ModalFooterDefaultContainer>
     );
-  }, [footer, cancelAction, modalColorType, onProceed, modalType]);
+  }, [footer, modalType, confirmText, modalColorType, onProceed, cancelAction]);
 
   const headerMemo = useMemo(
-    () => (
-      <ModalHeaderDefaultContainer
-        itemType={modalType === 'confirmAction' ? 'warning' : modalColorType}
-      >
-        {modalTitle}
-        {!abortEsc && modalType === 'normal' && (
-          <CloseIconContainer onClick={cancelAction}>
-            <CloseOutlined />
-          </CloseIconContainer>
-        )}
-      </ModalHeaderDefaultContainer>
-    ),
-    [modalTitle, modalType, modalColorType, abortEsc, cancelAction]
+    () =>
+      notDisplayTitle ? (
+        <CloseVisibleOnlyContainer onClick={cancelAction}>
+          <CloseOutlined />
+        </CloseVisibleOnlyContainer>
+      ) : (
+        <ModalHeaderDefaultContainer
+          itemType={modalType === 'confirmAction' ? 'warning' : modalColorType}
+        >
+          {modalTitle}
+          {!abortEsc && modalType === 'normal' && (
+            <CloseIconContainer onClick={cancelAction}>
+              <CloseOutlined />
+            </CloseIconContainer>
+          )}
+        </ModalHeaderDefaultContainer>
+      ),
+    [
+      notDisplayTitle,
+      modalType,
+      modalColorType,
+      modalTitle,
+      abortEsc,
+      cancelAction
+    ]
   );
 
   const contentMemo = useMemo(() => {

@@ -29,3 +29,10 @@ export const ModalContentDefaultContainer = styled.div`
 export const CloseIconContainer = styled.div`
   cursor: pointer;
 `;
+
+export const CloseVisibleOnlyContainer = styled.div`
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  cursor: pointer;
+`;
