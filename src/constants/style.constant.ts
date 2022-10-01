@@ -11,7 +11,7 @@ export const ColorPalette = {
   yellowMain: '#ffde54',
   orangeMain: '#ff6e01',
   redMain: '#f42829',
-  purpleMain: '#d96ff8',
+  purpleMain: '#7F56D9',
   bgColorContainer: '#f5f6fa',
   bgColor1: '#f3f4f6',
   bgCorder: '#e0e7f2',
@@ -149,5 +149,6 @@ export const ColorPalette = {
   purple_10: '#f4d4fd',
   purple_11: '#f7e2fe',
   purple_12: '#fbf1fe',
-  purple_13: '#ebf8ff'
+  purple_13: '#ebf8ff',
+  purle_classic: '#7F56D9'
 };

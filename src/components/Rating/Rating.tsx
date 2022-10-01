@@ -1,5 +1,6 @@
+import Rate from 'antd/lib/rate';
 import { debounce } from 'lodash';
-import Rate, { RateProps as AntdRateProps } from 'rc-rate/lib/Rate';
+import { RateProps as AntdRateProps } from 'rc-rate/lib/Rate';
 import { forwardRef, useCallback } from 'react';
 
 interface RateProps extends AntdRateProps {
@@ -15,7 +16,7 @@ const Rating = forwardRef<any, RateProps>((props, ref) => {
     []
   );
 
-  return <Rate allowHalf {...other} onChange={handleOnChange} allowClear />;
+  return <Rate allowHalf onChange={handleOnChange} ref={ref} {...other} />;
 });
 
 export default Rating;
