@@ -10,11 +10,16 @@ interface StackUIProps {
   icon: ReactNode;
   content: ReactNode;
   width: number | string;
+  onClick?: () => void;
 }
 
-const StackUI: FC<StackUIProps> = ({ content, icon, width }) => {
+const StackUI: FC<StackUIProps> = ({ content, icon, width, onClick }) => {
   return (
-    <StackUIWrapper style={{ width }} className="content-wrapper">
+    <StackUIWrapper
+      style={{ width }}
+      className="content-wrapper"
+      onClick={() => onClick?.()}
+    >
       <StackUIIconWrapper>{icon}</StackUIIconWrapper>
       <StackUIContentWrapper>{content}</StackUIContentWrapper>
     </StackUIWrapper>
