@@ -18,7 +18,7 @@ import {
 } from './Button.style';
 
 interface ButtonProps extends BaseButtonProps {
-  content: string | ReactNode;
+  content: ReactNode;
   prefixElement?: ReactNode;
   suffixElement?: ReactNode;
   onClick?: (e?: MouseEvent<HTMLDivElement>) => void;
@@ -27,6 +27,7 @@ interface ButtonProps extends BaseButtonProps {
   hideBtn?: boolean;
   unSeenBtn?: boolean;
   colorFill?: string;
+  style?: CSSProperties;
 }
 
 const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
@@ -43,6 +44,7 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
     hideBtn,
     unSeenBtn,
     colorFill,
+    style,
     ...other
   } = props;
   const btnId = useId();
@@ -63,11 +65,15 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
       key={`antd-btn-${btnId}`}
       style={{
         background: colorFill,
-        borderColor: colorFill
+        borderColor: colorFill,
+        display: hideBtn ? 'block' : 'none',
+        visibility: unSeenBtn ? 'hidden' : 'visible',
+        ...style
       }}
+      className={className}
     >
       {loading ? (
-        <LoadingContainer key={`loading-${btnId}`}>
+        <LoadingContainer key={`loading-${btnId}`} className={loadingClassName}>
           <LoadingOutlined />
           <p>Đang tải</p>
         </LoadingContainer>

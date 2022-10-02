@@ -6,8 +6,20 @@ import { Logo } from 'components/Images/Logo';
 import UserIcon from 'components/Images/UserIcon';
 import ModalUI from 'components/Modal/ModalUI';
 import StackUI from 'components/Stack/StackUI';
-import { FC, memo, useCallback, useId, useMemo, useState } from 'react';
+import ForgotPasswordForm from 'pages/Form/Forgot-password/ForgotPasswordForm';
+import SignUpForm from 'pages/Form/Sign-up/SignUpForm';
+import LoginForm from 'pages/Form/Login/LoginForm';
+import {
+  FC,
+  memo,
+  ReactNode,
+  useCallback,
+  useId,
+  useMemo,
+  useState
+} from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserActionModalType } from 'constants/user.constants';
 import {
   CursorPointer,
   HeaderContainer,
@@ -19,6 +31,8 @@ import './Header.style.css';
 const Header: FC = () => {
   const uniqueKey = useId();
   const [modal, setModal] = useState(false);
+  const [userActionModalType, setUserActionModalType] =
+    useState<UserActionModalType>(UserActionModalType.NONE);
   const navigate = useNavigate();
   const renderModalCart = useMemo(() => {
     if (!modal) {
@@ -31,7 +45,7 @@ const Header: FC = () => {
         modalTitle="Giỏ hàng"
         onCancel={() => setModal(false)}
         modalColorType="purple"
-        content=""
+        confirmText="Thanh toán"
       />
     );
   }, [modal]);
@@ -39,12 +53,58 @@ const Header: FC = () => {
   const renderPopupAccount = useMemo(
     () => (
       <>
-        <StackUI width={140} icon={<LoginOutlined />} content="Đăng nhập" />
-        <StackUI width={140} icon={<ImportOutlined />} content="Đăng ký" />
+        <StackUI
+          width={140}
+          icon={<LoginOutlined />}
+          content="Đăng nhập"
+          onClick={() => setUserActionModalType(UserActionModalType.LOG_IN)}
+        />
+        <StackUI
+          width={140}
+          icon={<ImportOutlined />}
+          content="Đăng ký"
+          onClick={() =>
+            setUserActionModalType(UserActionModalType.NEW_ACCOUNT)
+          }
+        />
       </>
     ),
     []
   );
+
+  const renderFormModal = useMemo(() => {
+    if (userActionModalType === UserActionModalType.NONE) {
+      return null;
+    }
+
+    let content: ReactNode;
+
+    switch (userActionModalType) {
+      case UserActionModalType.LOG_IN:
+        content = <LoginForm />;
+        break;
+      case UserActionModalType.NEW_ACCOUNT:
+        content = <SignUpForm />;
+        break;
+      case UserActionModalType.PW_RECOVER:
+        content = <ForgotPasswordForm />;
+        break;
+
+      default:
+        break;
+    }
+
+    return (
+      <ModalUI
+        open
+        modalTitle="none"
+        footer={<div />}
+        notDisplayTitle
+        content={content}
+        onCancel={() => setUserActionModalType(UserActionModalType.NONE)}
+      />
+    );
+  }, [userActionModalType]);
 
   const handleClickCart = useCallback(() => {
     setModal(true);
@@ -93,6 +153,7 @@ const Header: FC = () => {
         </ListIconWrapper>
       </HeaderContainer>
       {renderModalCart}
+      {renderFormModal}
     </>
   );
 };

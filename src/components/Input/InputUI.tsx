@@ -1,6 +1,6 @@
 import Input, { InputProps as AntdInputProps } from 'antd/lib/input/Input';
-import { debounce } from 'lodash';
-import { ChangeEvent, forwardRef, memo, useCallback, useId } from 'react';
+import { forwardRef, memo, useId, useMemo } from 'react';
+import { CSSProperties } from 'styled-components';
 import {
   DefaultContainerInput,
   LabelWrapper,
@@ -9,29 +9,35 @@ import {
 
 interface InputProps extends AntdInputProps {
   name: string;
-  handleOnChange?: (value: string) => void;
   label?: string;
   containerClassName?: string;
+  errors?: { [x: string]: any };
+  errTextStyle?: CSSProperties;
 }
 
 const InputUI = forwardRef<any, InputProps>((props, ref) => {
   const {
-    name,
-    handleOnChange,
     label,
     required,
     containerClassName,
+    name,
+    errors,
+    errTextStyle,
     ...other
   } = props;
   const uniqueKey = useId();
 
-  const handleChangeKeyboard = useCallback(
-    debounce((e: ChangeEvent<HTMLInputElement>) => {
-      const currentValue = String(e.target.value);
-      handleOnChange?.(currentValue);
-    }),
-    [handleOnChange]
-  );
+  const renderErrorText = useMemo(() => {
+    if (errors && errors?.[name]) {
+      return (
+        <div style={errTextStyle} className="error-text">
+          {String(errors?.[name]?.message)}
+        </div>
+      );
+    }
+
+    return null;
+  }, [errTextStyle, errors, name]);
 
   return (
     <DefaultContainerInput className={containerClassName} key={uniqueKey}>
@@ -40,14 +46,8 @@ const InputUI = forwardRef<any, InputProps>((props, ref) => {
           {required && <RequireText>*</RequireText>} {label}
         </LabelWrapper>
       )}
-      <Input
-        name={name}
-        ref={ref}
-        allowClear
-        required={required}
-        onChange={handleChangeKeyboard}
-        {...other}
-      />
+      <Input ref={ref} allowClear required={required} {...other} />
+      {renderErrorText}
     </DefaultContainerInput>
   );
 });
