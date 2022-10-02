@@ -41,8 +41,8 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
     onKeyDown,
     loadingClassName,
     type,
-    hideBtn,
-    unSeenBtn,
+    hideBtn = false,
+    unSeenBtn = false,
     colorFill,
     style,
     ...other
@@ -66,7 +66,7 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
       style={{
         background: colorFill,
         borderColor: colorFill,
-        display: hideBtn ? 'block' : 'none',
+        display: hideBtn ? 'none' : 'block',
         visibility: unSeenBtn ? 'hidden' : 'visible',
         ...style
       }}

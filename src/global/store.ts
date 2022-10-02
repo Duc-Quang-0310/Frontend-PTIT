@@ -6,14 +6,16 @@ import {
   Reducer,
   Store
 } from '@reduxjs/toolkit';
-import counterSlice from './common/counter/counter.slice';
+import CounterSlice from './common/counter/counter.slice';
 import persistConfig from './persist.config';
 import rootSaga from './root.saga';
+import AuthSlice from './common/auth/auth.slice';
 
 const sagaMiddleware = createSagaMiddleware();
 
 const combinedReducer = combineReducers({
-  counter: counterSlice
+  counter: CounterSlice,
+  auth: AuthSlice
 });
 
 export const store: Store = configureStore({

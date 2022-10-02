@@ -49,3 +49,18 @@ export const AnotherOptionContainer = styled.div`
     cursor: pointer;
   }
 `;
+
+export const ErrorAPIBox = styled.div`
+  width: 61%;
+  border-radius: 10px;
+  text-align: center;
+  background-color: ${(props) => {
+    if (props.itemProp === 'success') {
+      return ColorPalette.green_3;
+    }
+    return ColorPalette.red_5;
+  }};
+  color: ${ColorPalette.white};
+  padding-block: 10px;
+  font-weight: bold;
+`;
