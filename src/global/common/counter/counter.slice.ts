@@ -7,7 +7,7 @@ export interface CounterState {
 
 const initialState: CounterState = {
   value: 0,
-  status: 'idle',
+  status: 'idle'
 };
 
 export const counterSlice = createSlice({
@@ -26,13 +26,22 @@ export const counterSlice = createSlice({
     incrementSaga: (state: CounterState) => {
       state.status = 'loading';
     },
-    incrementSagaSuccess: (state: CounterState, action: PayloadAction<number>) => {
+    incrementSagaSuccess: (
+      state: CounterState,
+      action: PayloadAction<number>
+    ) => {
       state.status = 'idle';
       state.value += action.payload;
-    },
-  },
+    }
+  }
 });
 
-export const { increment, decrement, incrementByAmount, incrementSaga, incrementSagaSuccess } = counterSlice.actions;
+export const {
+  increment,
+  decrement,
+  incrementByAmount,
+  incrementSaga,
+  incrementSagaSuccess
+} = counterSlice.actions;
 
 export default counterSlice.reducer;

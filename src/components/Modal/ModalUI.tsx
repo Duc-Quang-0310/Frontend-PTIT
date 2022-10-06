@@ -34,22 +34,6 @@ interface ModalProps extends AntdModalProps {
   notDisplayTitle?: boolean;
 }
 
-const DetectEsc: FC<{ close: () => void }> = ({ close }) => {
-  useEffect(() => {
-    const handleClose = (e: KeyboardEvent) => {
-      if (e.keyCode === 27) {
-        if (close) {
-          close();
-        }
-      }
-    };
-    document.addEventListener('keydown', handleClose);
-    return () => document.removeEventListener('keydown', handleClose);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return null;
-};
-
 const ModalUI: FC<ModalProps> = (props) => {
   const {
     footer,
@@ -141,26 +125,33 @@ const ModalUI: FC<ModalProps> = (props) => {
     return content;
   }, [content, modalType]);
 
+  useEffect(() => {
+    const handleClose = (e: KeyboardEvent) => {
+      if (e.keyCode === 27) {
+        cancelAction();
+      }
+    };
+    document.addEventListener('keydown', handleClose, false);
+    return () => {
+      document.removeEventListener('keydown', handleClose, false);
+    };
+  }, [cancelAction]);
+
   return (
-    <>
-      {!abortEsc && <DetectEsc close={cancelAction} />}
-      <Modal
-        {...other}
-        key={uniqueKey}
-        footer={footerMemo}
-        title=""
-        closable={false}
-        bodyStyle={{ padding: 0 }}
-        keyboard
-        wrapClassName={cn(wrapClassName, 'default-wrapper')}
-        destroyOnClose
-      >
-        {headerMemo}
-        <ModalContentDefaultContainer>
-          {contentMemo}
-        </ModalContentDefaultContainer>
-      </Modal>
-    </>
+    <Modal
+      {...other}
+      key={uniqueKey}
+      footer={footerMemo}
+      title=""
+      closable={false}
+      bodyStyle={{ padding: 0 }}
+      keyboard={false}
+      wrapClassName={cn(wrapClassName, 'default-wrapper')}
+      destroyOnClose
+    >
+      {headerMemo}
+      <ModalContentDefaultContainer>{contentMemo}</ModalContentDefaultContainer>
+    </Modal>
   );
 };
 
