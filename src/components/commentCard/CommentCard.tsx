@@ -22,8 +22,9 @@ interface CommentCardProps extends HTMLAttributes<HTMLDivElement> {
   date?: string | Date;
   starRate?: number;
   loading?: boolean;
-  currentID: string;
-  commentUserID: string;
+  currentID?: string;
+  commentUserID?: string;
+  disableStar?: boolean;
 }
 
 const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
@@ -36,6 +37,7 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
     currentID,
     commentUserID,
     loading,
+    disableStar = false,
     ...other
   } = props;
   const uniqueKey = useId();
@@ -66,7 +68,7 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
               <TopSection>
                 <Rating
                   handleOnChangeStar={handleChangeStar}
-                  disabled={currentID === commentUserID}
+                  disabled={disableStar || currentID === commentUserID}
                   style={{ color: ColorPalette.purpleMain }}
                   defaultValue={starRate}
                 />
@@ -77,7 +79,7 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
 
               <FlexBetween>
                 <BoldAuthor>{authorName}</BoldAuthor>
-                <DateTitle>{moment(date).format('Do MMM YYYY')}</DateTitle>
+                <DateTitle>{moment(date).format('Do MMM, YYYY')}</DateTitle>
               </FlexBetween>
             </>
           )}
