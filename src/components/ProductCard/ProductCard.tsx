@@ -29,6 +29,8 @@ interface ProductCardProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   price: string;
   loading?: boolean;
+  rateStar?: number;
+  disabledStar?: boolean;
 }
 
 const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
@@ -38,6 +40,8 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
     title,
     price,
     loading,
+    rateStar,
+    disabledStar = false,
     ...other
   } = props;
   const uniqueId = useId();
@@ -120,8 +124,12 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
             <FlexBetween
               style={{ marginTop: 5, display: 'flex', alignItems: 'center' }}
             >
-              <PriceContainer>{price}</PriceContainer>
-              <Rating disabled={true} style={{ fontSize: 17 }} />
+              <PriceContainer>{`${price} đ`}</PriceContainer>
+              <Rating
+                disabled={disabledStar || false}
+                style={{ fontSize: 17, color: ColorPalette.purpleMain }}
+                defaultValue={rateStar}
+              />
             </FlexBetween>
           </>
         )}

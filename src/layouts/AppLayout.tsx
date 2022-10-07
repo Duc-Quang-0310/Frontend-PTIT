@@ -1,12 +1,7 @@
 import { FC, useId } from 'react';
 import { Outlet } from 'react-router';
-import {
-  AppLayoutWrapper,
-  ContentWrapper,
-  MainContent
-} from './AppLayout.style';
+import { AppLayoutWrapper, ContentWrapper } from './AppLayout.style';
 import Header from './Header/Header';
-import Sidebar from './Sidebar/Sidebar';
 
 const AppLayout: FC = () => {
   const uniqueKey = useId();
@@ -15,10 +10,13 @@ const AppLayout: FC = () => {
     <AppLayoutWrapper key={uniqueKey}>
       <Header />
       <ContentWrapper>
-        <Sidebar />
-        <MainContent>
-          <Outlet />
-        </MainContent>
+        <div
+          style={{
+            width: '100vw',
+            height: '70px'
+          }}
+        />
+        <Outlet />
       </ContentWrapper>
     </AppLayoutWrapper>
   );

@@ -8,6 +8,9 @@ export const HeaderContainer = styled.div`
   padding-inline: 90px;
   display: flex;
   justify-content: space-between;
+  position: fixed;
+  width: 100vw;
+  z-index: 999;
 `;
 
 export const CursorPointer = styled.div`

@@ -20,6 +20,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserActionModalType } from 'constants/user.constants';
+import { ColorPalette } from 'constants/style.constant';
 import {
   CursorPointer,
   HeaderContainer,
@@ -116,7 +117,10 @@ const Header: FC = () => {
 
   return (
     <>
-      <HeaderContainer key={`${uniqueKey}container`}>
+      <HeaderContainer
+        key={`${uniqueKey}container`}
+        style={{ backgroundColor: ColorPalette.white }}
+      >
         <CursorPointer onClick={handleRedirectHome}>
           <Logo blockWidth={150} blockHeight="100%" />
         </CursorPointer>
