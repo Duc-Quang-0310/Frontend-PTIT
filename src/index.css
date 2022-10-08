@@ -8,3 +8,33 @@
   font-size: 15px;
   color: #f53e3e
 }
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #7F56D9  !important; 
+  font-weight: 500;
+}
+
+.ant-tabs-tab:hover  {
+  color: #7F56D9  !important; 
+}
+
+.ant-tabs-ink-bar {
+  position: absolute;
+  background: #7F56D9  !important;
+  pointer-events: none;
+}
+
+.ant-btn-primary {
+  background: #7F56D9  !important;
+  border-color: #7F56D9  !important;
+}
+
+.ant-btn-primary:hover {
+  background: #7F56D9  !important;
+  border-color: #7F56D9  !important;
+}
+
+.ant-btn-default:hover {
+  color: #7F56D9  !important;
+  border-color: #7F56D9  !important;
+}

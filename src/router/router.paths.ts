@@ -1,3 +1,4 @@
 export const routerPaths = {
-  HOME: ''
+  HOME: '',
+  LAPTOP_DETAIL: (id?: string) => `/laptop/${id || ':id'}`
 };
