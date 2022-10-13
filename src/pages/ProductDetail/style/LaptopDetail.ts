@@ -176,3 +176,17 @@ export const LaptopListImgContainer = styled.div`
     }
   }
 `;
+
+export const CommentBlock = styled.div`
+  padding: 40px 0;
+  border-bottom: 1px solid ${ColorPalette.gray_15};
+`;
+
+export const InputBlock = styled.div`
+  padding-bottom: 13px;
+  border-bottom: 1px solid ${ColorPalette.gray_15};
+  h3 {
+    font-weight: 600;
+    margin-bottom: 13px;
+  }
+`;
