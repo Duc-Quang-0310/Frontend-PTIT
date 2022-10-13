@@ -25,6 +25,7 @@ interface CommentCardProps extends HTMLAttributes<HTMLDivElement> {
   currentID?: string;
   commentUserID?: string;
   disableStar?: boolean;
+  imgWrapperWidth?: string;
 }
 
 const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
@@ -38,6 +39,7 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
     commentUserID,
     loading,
     disableStar = false,
+    imgWrapperWidth,
     ...other
   } = props;
   const uniqueKey = useId();
@@ -52,7 +54,7 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
       {...other}
       key={`${uniqueKey}-${authorName}-${date}`}
     >
-      <ImageWrapper>
+      <ImageWrapper itemProp={imgWrapperWidth}>
         {!loading ? (
           <img alt={userAvatar} src={userAvatar} />
         ) : (

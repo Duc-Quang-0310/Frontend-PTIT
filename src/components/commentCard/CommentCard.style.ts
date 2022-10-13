@@ -10,7 +10,7 @@ export const CommentCardContainer = styled.div`
 export const ImageWrapper = styled.div`
   border-radius: 20px;
   height: 100%;
-  width: 215px;
+  width: ${(props) => props.itemProp || '215px'};
   overflow: hidden;
   display: flex;
   img {
