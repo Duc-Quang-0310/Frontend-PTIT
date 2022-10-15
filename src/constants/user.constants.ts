@@ -87,3 +87,58 @@ export const SignUpFormValidation = Yup.object().shape({
   firstName: Yup.string().trim().nullable(),
   lastName: Yup.string().trim().nullable()
 });
+
+export enum Tab {
+  ADDRESS = 'a',
+  CHANGE_PASSWORD = 'c',
+  RECEIPT = 'r',
+  FAVORITE = 'f'
+}
+
+export const UpdateAddressSchema = Yup.object().shape({
+  province: Yup.string().trim().required('Thành phố là bắt buộc'),
+  district: Yup.string().trim().required('Quận là bắt buộc'),
+  ward: Yup.string().trim().required('Huyện là bắt buộc'),
+  address: Yup.string().trim().required('Địa chỉ là bắt buộc'),
+  firstName: Yup.string().trim().nullable(),
+  lastName: Yup.string().trim().nullable()
+});
+
+export const UpdateAddressValue = {
+  province: '',
+  district: '',
+  ward: '',
+  address: '',
+  firstName: '',
+  lastName: ''
+};
+
+export const UpdatePasswordValue = {
+  old: '',
+  new: '',
+  newRepeat: ''
+};
+
+export const UpdatePasswordSchema = Yup.object().shape({
+  old: Yup.string()
+    .min(8, 'Mật khẩu không được ngắn hơn 8 ký tự')
+    .max(30, 'Mật khẩu không được dài hơn 30 ký tự')
+    .required('Mật khẩu không được để trống')
+    .matches(
+      REGEX_PASSWORD,
+      'Tối thiểu 8 ký tự, Một chữ hoa, Một chữ thường, Một chữ số, và Một ký tự đặc biệt'
+    ),
+  new: Yup.string()
+    .min(8, 'Mật khẩu không được ngắn hơn 8 ký tự')
+    .max(30, 'Mật khẩu không được dài hơn 30 ký tự')
+    .required('Mật khẩu không được để trống')
+    .matches(
+      REGEX_PASSWORD,
+      'Tối thiểu 8 ký tự, Một chữ hoa, Một chữ thường, Một chữ số, và Một ký tự đặc biệt'
+    ),
+  newRepeat: Yup.string()
+    .min(8, 'Mật khẩu không được ngắn hơn 8 ký tự')
+    .max(30, 'Mật khẩu không được dài hơn 30 ký tự')
+    .required('Mật khẩu không được để trống')
+    .oneOf([Yup.ref('new')], 'Mật khẩu nhập lại không đúng ')
+});

@@ -14,5 +14,5 @@ export const RequireText = styled.span`
 `;
 
 export const DefaultContainerInput = styled.div`
-  margin-inline: 10px;
+  margin-inline: ${(props) => (props.itemProp === '' ? '10px' : 'none')};
 `;

@@ -13,6 +13,7 @@ interface InputProps extends AntdInputProps {
   containerClassName?: string;
   errors?: { [x: string]: any };
   errTextStyle?: CSSProperties;
+  marginNone?: 'marginNone' | '';
 }
 
 const InputUI = forwardRef<any, InputProps>((props, ref) => {
@@ -23,6 +24,7 @@ const InputUI = forwardRef<any, InputProps>((props, ref) => {
     name,
     errors,
     errTextStyle,
+    marginNone = '',
     ...other
   } = props;
   const uniqueKey = useId();
@@ -40,7 +42,11 @@ const InputUI = forwardRef<any, InputProps>((props, ref) => {
   }, [errTextStyle, errors, name]);
 
   return (
-    <DefaultContainerInput className={containerClassName} key={uniqueKey}>
+    <DefaultContainerInput
+      className={containerClassName}
+      key={uniqueKey}
+      itemProp={marginNone}
+    >
       {label && (
         <LabelWrapper>
           {required && <RequireText>*</RequireText>} {label}

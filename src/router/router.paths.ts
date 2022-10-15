@@ -1,4 +1,5 @@
 export const routerPaths = {
   HOME: '',
-  LAPTOP_DETAIL: (id?: string) => `/laptop/${id || ':id'}`
+  LAPTOP_DETAIL: (id?: string) => `/laptop/${id || ':id'}`,
+  USER_PROFILE: (id?: string) => `/user/${id || ':id'}`
 };

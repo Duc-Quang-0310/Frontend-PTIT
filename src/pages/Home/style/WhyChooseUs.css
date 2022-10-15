@@ -10,6 +10,7 @@
     transition: all ease 0.3s;
     background-color: white;
     user-select: none;
+    width: 250px;
 }
 
 .hoverable:hover {

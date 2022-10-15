@@ -38,3 +38,23 @@
   color: #7F56D9  !important;
   border-color: #7F56D9  !important;
 }
+
+.margin-none {
+  margin-inline: none !important;
+}
+
+.close-icon {
+  width: 20px;
+  height: 20px;
+  background-color: #f53e3e;
+  border-radius: 50%;
+  position: absolute;
+  color: white;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  right:25px;
+  top:10px
+}

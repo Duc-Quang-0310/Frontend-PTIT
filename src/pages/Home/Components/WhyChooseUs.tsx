@@ -46,7 +46,7 @@ const WhyChooseUs: FC = () => {
         }}
       >
         <h3>Tại sao bạn nên chọn chúng tôi</h3>
-        <Row style={{ width: '60%' }}>
+        <Row style={{ width: '70%' }}>
           <Col xxl={6} style={styled} className="hoverable">
             <IconBackground>
               <TruckIcon fill={ColorPalette.white} />
