@@ -3,7 +3,7 @@ import { FC, ReactNode, Suspense } from 'react';
 import styled from 'styled-components';
 
 const LoadingLayout = styled.div`
-  height: 100%;
+  height: calc(100vh - 70px);
   display: flex;
   justify-content: center;
   align-items: center;

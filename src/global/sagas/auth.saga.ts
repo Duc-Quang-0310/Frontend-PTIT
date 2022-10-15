@@ -4,15 +4,30 @@ import {
   checkEmailExistActionRequest,
   createNewAccountActionComplete,
   createNewAccountActionRequest,
+  getDistrictActionComplete,
+  getDistrictActionRequest,
+  getProvinceActionComplete,
+  getProvinceActionRequest,
+  getWardActionComplete,
+  getWardActionRequest,
   resetAuthState
 } from 'global/common/auth/auth.slice';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import {
   CheckEmailExistDataResponse,
   CreateNewAccountBody,
-  CreateNewAccountDataResponse
+  CreateNewAccountDataResponse,
+  DistrictData,
+  ProvinceData,
+  WardData
 } from 'services/client.interface';
-import { createNewAccount, validateEmailExist } from 'services/client.services';
+import {
+  createNewAccount,
+  getDistrict,
+  getProvince,
+  getWard,
+  validateEmailExist
+} from 'services/client.services';
 
 function* createNewAccountActionSaga(
   action: PayloadAction<CreateNewAccountBody>
@@ -57,9 +72,70 @@ function* checkEmailExistActionSaga(action: PayloadAction<string>) {
   }
 }
 
+function* getProvinceActionSaga() {
+  try {
+    const res: ProvinceData = yield call(() => getProvince());
+    yield put(
+      getProvinceActionComplete({
+        data: res.results
+      })
+    );
+  } catch (error) {
+    yield put(
+      getProvinceActionComplete({
+        data: null
+      })
+    );
+  }
+}
+
+function* getDistrictActionSaga(action: PayloadAction<{ provinceId: string }>) {
+  try {
+    const res: DistrictData = yield call(() =>
+      getDistrict(action.payload.provinceId)
+    );
+    console.log(
+      '🚀 ~ file: auth.saga.ts ~ line 97 ~ function*getDistrictActionSaga ~ res',
+      res
+    );
+
+    yield put(
+      getDistrictActionComplete({
+        data: res.results
+      })
+    );
+  } catch (error) {
+    yield put(
+      getDistrictActionComplete({
+        data: null
+      })
+    );
+  }
+}
+
+function* getWardActionSaga(action: PayloadAction<{ districtId: string }>) {
+  try {
+    const res: WardData = yield call(() => getWard(action.payload.districtId));
+    yield put(
+      getWardActionComplete({
+        data: res.results
+      })
+    );
+  } catch (error) {
+    yield put(
+      getWardActionComplete({
+        data: null
+      })
+    );
+  }
+}
+
 export default function* authSaga() {
   yield all([
     takeLatest(createNewAccountActionRequest.type, createNewAccountActionSaga),
-    takeLatest(checkEmailExistActionRequest.type, checkEmailExistActionSaga)
+    takeLatest(checkEmailExistActionRequest.type, checkEmailExistActionSaga),
+    takeLatest(getProvinceActionRequest.type, getProvinceActionSaga),
+    takeLatest(getDistrictActionRequest.type, getDistrictActionSaga),
+    takeLatest(getWardActionRequest.type, getWardActionSaga)
   ]);
 }

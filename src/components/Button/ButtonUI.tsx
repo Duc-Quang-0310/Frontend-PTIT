@@ -11,6 +11,7 @@ import {
 import Button from 'antd/es/button';
 import { BaseButtonProps } from 'antd/es/button/button';
 import LoadingOutlined from '@ant-design/icons/lib/icons/LoadingOutlined';
+import { ColorPalette } from 'constants/style.constant';
 import {
   LoadingContainer,
   PrefixContainer,
@@ -28,6 +29,7 @@ interface ButtonProps extends BaseButtonProps {
   unSeenBtn?: boolean;
   colorFill?: string;
   style?: CSSProperties;
+  disableConfirm?: boolean;
 }
 
 const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
@@ -45,6 +47,7 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
     unSeenBtn = false,
     colorFill,
     style,
+    disableConfirm = false,
     ...other
   } = props;
   const btnId = useId();
@@ -59,7 +62,7 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
   return (
     <Button
       {...other}
-      disabled={loading as boolean}
+      disabled={disableConfirm || (loading as boolean)}
       type={type || 'primary'}
       ref={ref}
       key={`antd-btn-${btnId}`}
@@ -84,7 +87,13 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
           key={`button-${btnId}`}
         >
           {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
-          {content}
+          <span
+            style={{
+              color: disableConfirm ? ColorPalette.white : undefined
+            }}
+          >
+            {content}
+          </span>
           {suffixElement && <SuffixContainer>{suffixElement}</SuffixContainer>}
         </div>
       )}

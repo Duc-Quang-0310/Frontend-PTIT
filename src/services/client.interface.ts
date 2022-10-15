@@ -30,8 +30,64 @@ export interface CheckEmailExistDataResponse {
   exist: boolean;
 }
 
+export interface ProvinceData {
+  results: {
+    province_id: string;
+    province_name: string;
+    province_type: string;
+  }[];
+}
+
+export interface DistrictData {
+  results: {
+    district_id: string;
+    district_name: string;
+    district_type: string;
+    province_id: string;
+  }[];
+}
+
+export interface WardData {
+  results: {
+    district_id: string;
+    ward_id: string;
+    ward_name: string;
+    ward_type: string;
+  }[];
+}
+
+export type Province =
+  | {
+      province_id: string;
+      province_name: string;
+      province_type: string;
+    }[]
+  | null;
+
+export type District =
+  | {
+      district_id: string;
+      district_name: string;
+      district_type: string;
+      province_id: string;
+    }[]
+  | null;
+
+export type Ward =
+  | {
+      district_id: string;
+      ward_id: string;
+      ward_name: string;
+      ward_type: string;
+    }[]
+  | null;
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 
 export interface CheckEmailExistResponse
   extends AxiosResponse<CheckEmailExistDataResponse, any> {}
+
+export interface ProvinceResponse extends AxiosResponse<ProvinceData, any> {}
+export interface DistrictResponse extends AxiosResponse<DistrictData, any> {}
+export interface WardResponse extends AxiosResponse<WardData, any> {}

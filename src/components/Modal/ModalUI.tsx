@@ -23,7 +23,7 @@ import {
 } from './ModalUI.style';
 
 interface ModalProps extends AntdModalProps {
-  modalTitle: string;
+  modalTitle: ReactNode;
   onProceed?: () => void;
   onCancel?: () => void;
   content?: ReactNode;
@@ -32,6 +32,7 @@ interface ModalProps extends AntdModalProps {
   abortEsc?: boolean;
   confirmText?: string;
   notDisplayTitle?: boolean;
+  disableConfirm?: boolean;
 }
 
 const ModalUI: FC<ModalProps> = (props) => {
@@ -47,6 +48,7 @@ const ModalUI: FC<ModalProps> = (props) => {
     abortEsc = false,
     confirmText,
     notDisplayTitle = false,
+    disableConfirm = false,
     ...other
   } = props;
 
@@ -68,6 +70,7 @@ const ModalUI: FC<ModalProps> = (props) => {
             content="Xác nhận"
             colorFill={ColorPalette.red_6}
             onClick={() => onProceed?.()}
+            disableConfirm={disableConfirm}
           />
         </ModalFooterDefaultContainer>
       );
@@ -84,10 +87,19 @@ const ModalUI: FC<ModalProps> = (props) => {
           content={confirmText || 'Xác nhận'}
           colorFill={renderColorByType(modalColorType)}
           onClick={() => onProceed?.()}
+          disableConfirm={disableConfirm}
         />
       </ModalFooterDefaultContainer>
     );
-  }, [footer, modalType, confirmText, modalColorType, onProceed, cancelAction]);
+  }, [
+    footer,
+    modalType,
+    confirmText,
+    modalColorType,
+    disableConfirm,
+    onProceed,
+    cancelAction
+  ]);
 
   const headerMemo = useMemo(
     () =>

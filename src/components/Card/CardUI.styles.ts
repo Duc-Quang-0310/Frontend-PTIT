@@ -8,6 +8,7 @@ export const CardContainer = styled.div`
   -webkit-box-shadow: 12px 1px 14px 4px rgba(118, 118, 118, 0.27);
   box-shadow: 12px 1px 14px 4px rgba(118, 118, 118, 0.27);
   overflow: hidden;
+  width: 100%;
 `;
 
 export const Img = styled.img`
@@ -21,6 +22,7 @@ export const Content = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  flex: 1;
 `;
 
 export const CardTitle = styled.h2`

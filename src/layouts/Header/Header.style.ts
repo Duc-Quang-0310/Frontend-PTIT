@@ -34,3 +34,63 @@ export const IconWrapper = styled.div`
   transition: all ease-in 0.2s;
   cursor: pointer;
 `;
+
+export const CartItem = styled.div`
+  display: flex;
+  margin-bottom: 25px;
+
+  .imgContainer {
+    width: 100px;
+    height: 100px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .contentContainer {
+    flex: 1;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+
+    h5 {
+      color: ${ColorPalette.gray_3};
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .footer {
+      border-top: 1px solid ${ColorPalette.gray_10};
+      padding-top: 8px;
+      margin-top: auto;
+    }
+  }
+`;
+
+export const ScrollableCart = styled.div`
+  max-height: ${(props) => props.itemProp || '350px'};
+  overflow: auto;
+  padding-right: 20px;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 7px;
+  }
+
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${ColorPalette.purpleMain};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: ${ColorPalette.purpleMain};
+  }
+`;

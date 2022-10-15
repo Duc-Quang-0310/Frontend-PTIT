@@ -1,10 +1,17 @@
+import axios from 'axios';
 import request from './axios.connection';
 import {
   CheckEmailExistDataResponse,
   CheckEmailExistResponse,
   CreateNewAccountBody,
   CreateNewAccountDataResponse,
-  CreateNewAccountResponse
+  CreateNewAccountResponse,
+  DistrictData,
+  DistrictResponse,
+  ProvinceData,
+  ProvinceResponse,
+  WardData,
+  WardResponse
 } from './client.interface';
 
 export const createNewAccount = async (
@@ -23,6 +30,29 @@ export const validateEmailExist = async (
   const response: CheckEmailExistResponse = await request.post(
     '/api/user/email-check',
     { email }
+  );
+  return response.data;
+};
+
+export const getProvince = async (): Promise<ProvinceData> => {
+  const response: ProvinceResponse = await axios.get(
+    'https://vapi.vnappmob.com/api/province'
+  );
+  return response.data;
+};
+
+export const getDistrict = async (
+  provinceId: string
+): Promise<DistrictData> => {
+  const response: DistrictResponse = await axios.get(
+    `https://vapi.vnappmob.com/api/province/district/${provinceId}`
+  );
+  return response.data;
+};
+
+export const getWard = async (districtID: string): Promise<WardData> => {
+  const response: WardResponse = await axios.get(
+    `https://vapi.vnappmob.com/api/province/ward/${districtID}`
   );
   return response.data;
 };

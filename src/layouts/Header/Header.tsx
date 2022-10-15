@@ -1,5 +1,12 @@
-import { ImportOutlined, LoginOutlined } from '@ant-design/icons';
-import { Popover } from 'antd';
+import {
+  ImportOutlined,
+  LeftOutlined,
+  LoginOutlined,
+  ShoppingCartOutlined,
+  PlusCircleTwoTone,
+  MinusCircleTwoTone
+} from '@ant-design/icons';
+import { Popover, Result } from 'antd';
 import { BellIcon } from 'components/Images/BellIcon';
 import { CartIcon } from 'components/Images/CartIcon';
 import { Logo } from 'components/Images/Logo';
@@ -19,13 +26,23 @@ import {
   useState
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserActionModalType } from 'constants/user.constants';
+import * as Yup from 'yup';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import EmptyUI from 'components/Empty/EmptyUI';
 import { ColorPalette } from 'constants/style.constant';
+import { FlexBasic } from 'pages/ProductDetail/style/LaptopDetail';
+import { InfoTitle } from 'pages/profile/style/UserProfile.styles';
+import InputUI from 'components/Input/InputUI';
+import { FlexBetween } from 'components/commentCard/CommentCard.style';
+import { UserActionModalType } from 'constants/user.constants';
 import {
+  CartItem,
   CursorPointer,
   HeaderContainer,
   IconWrapper,
-  ListIconWrapper
+  ListIconWrapper,
+  ScrollableCart
 } from './Header.style';
 import './Header.style.css';
 
@@ -34,7 +51,231 @@ const Header: FC = () => {
   const [modal, setModal] = useState(false);
   const [userActionModalType, setUserActionModalType] =
     useState<UserActionModalType>(UserActionModalType.NONE);
+  const [paymentStep, setPaymentStep] = useState(1);
   const navigate = useNavigate();
+
+  const {
+    formState: { errors },
+    control,
+    handleSubmit
+  } = useForm<FieldValues>({
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      address: ''
+    },
+    resolver: yupResolver(
+      Yup.object().shape({
+        name: Yup.string().required('Tên người nhận là bắt buộc'),
+        address: Yup.string().required('Địa chỉ là bắt buộc')
+      })
+    )
+  });
+
+  const cartItem = useMemo(
+    () => [
+      {
+        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+        price: '19.990.000',
+        quantity: 2,
+        name: 'May tinh'
+      },
+      {
+        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+        price: '19.990.000',
+        quantity: 2,
+        name: 'May tinh'
+      },
+      {
+        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+        price: '19.990.000',
+        quantity: 2,
+        name: 'May tinh'
+      },
+      {
+        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+        price: '19.990.000',
+        quantity: 2,
+        name: 'May tinh'
+      }
+    ],
+    []
+  );
+
+  const handleOnClickSubmit = useCallback((value: any) => {
+    //
+    setPaymentStep(3);
+  }, []);
+
+  const renderContentByStep = useMemo(() => {
+    if (cartItem.length === 0) {
+      return <EmptyUI />;
+    }
+
+    if (paymentStep === 1) {
+      return (
+        <ScrollableCart>
+          {cartItem?.map((item, index) => (
+            <CartItem key={item.quantity + index}>
+              <div className="imgContainer">
+                <img src={item.img} alt={item.name} />
+              </div>
+
+              <div className="contentContainer">
+                <h5>{item.name}</h5>
+                <div className="footer">
+                  <FlexBetween>
+                    <div className="btnCombination">
+                      <PlusCircleTwoTone twoToneColor={ColorPalette.green_16} />
+                      <span>{item.quantity}</span>
+                      <MinusCircleTwoTone twoToneColor={ColorPalette.red_11} />
+                    </div>
+                    <span
+                      style={{ fontWeight: '600', color: ColorPalette.red_4 }}
+                    >
+                      {item.price} đ
+                    </span>
+                  </FlexBetween>
+                </div>
+              </div>
+            </CartItem>
+          ))}
+        </ScrollableCart>
+      );
+    }
+
+    if (paymentStep === 2) {
+      return (
+        <div>
+          <InfoTitle>Tên người nhận </InfoTitle>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field: { value, onChange, ref } }) => {
+              return (
+                <InputUI
+                  ref={ref}
+                  value={value}
+                  errors={errors}
+                  name="name"
+                  onChange={onChange}
+                  marginNone="marginNone"
+                />
+              );
+            }}
+          />
+
+          <InfoTitle>Địa chỉ người nhận </InfoTitle>
+          <Controller
+            name="address"
+            control={control}
+            render={({ field: { value, onChange, ref } }) => {
+              return (
+                <InputUI
+                  ref={ref}
+                  value={value}
+                  errors={errors}
+                  name="address"
+                  onChange={onChange}
+                  marginNone="marginNone"
+                />
+              );
+            }}
+          />
+
+          <ScrollableCart itemProp="250px" style={{ marginTop: 25 }}>
+            {cartItem?.map((item, index) => (
+              <CartItem key={item.quantity + index}>
+                <div className="imgContainer">
+                  <img src={item.img} alt={item.name} />
+                </div>
+
+                <div className="contentContainer">
+                  <h5>{item.name}</h5>
+                  <div className="footer">
+                    <FlexBetween>
+                      <div className="btnCombination">
+                        <PlusCircleTwoTone
+                          twoToneColor={ColorPalette.green_16}
+                        />
+                        <span>{item.quantity}</span>
+                        <MinusCircleTwoTone
+                          twoToneColor={ColorPalette.red_11}
+                        />
+                      </div>
+                      <span
+                        style={{ fontWeight: '600', color: ColorPalette.red_4 }}
+                      >
+                        {item.price} đ
+                      </span>
+                    </FlexBetween>
+                  </div>
+                </div>
+              </CartItem>
+            ))}
+          </ScrollableCart>
+        </div>
+      );
+    }
+
+    return (
+      <Result
+        status="success"
+        title="Xử lý đơn hàng thành công"
+        subTitle="Bạn hãy đợi nhân viên của chúng tôi liên lạc trong khoảng thời gian gần nhất"
+      />
+    );
+  }, [cartItem, control, paymentStep, errors]);
+
+  const handleOnProceedCartModal = useCallback(() => {
+    if (paymentStep === 1) {
+      return setPaymentStep(2);
+    }
+
+    if (paymentStep === 2) {
+      // TODO call API
+      return handleSubmit(handleOnClickSubmit)();
+    }
+
+    setModal(false);
+    setPaymentStep(1);
+  }, [handleOnClickSubmit, handleSubmit, paymentStep]);
+
+  const renderConfirmCartText = useMemo(() => {
+    if (paymentStep === 1) {
+      return 'Thanh toán';
+    }
+
+    if (paymentStep === 2) {
+      return 'Đặt hàng';
+    }
+    return 'Hoàn tất';
+  }, [paymentStep]);
+
+  const renderModalCartTitle = useMemo(
+    () =>
+      paymentStep === 1 ? (
+        <FlexBasic>
+          <ShoppingCartOutlined
+            style={{
+              fontSize: 15,
+              marginBlock: 'auto'
+            }}
+          />
+          <span>Giỏ hàng</span>
+        </FlexBasic>
+      ) : (
+        <FlexBasic>
+          <LeftOutlined
+            style={{ fontSize: 15, marginBlock: 'auto', cursor: 'pointer' }}
+            onClick={() => setPaymentStep((prev) => prev - 1)}
+          />
+          <span>Thanh toán</span>
+        </FlexBasic>
+      ),
+    [paymentStep]
+  );
+
   const renderModalCart = useMemo(() => {
     if (!modal) {
       return null;
@@ -43,13 +284,26 @@ const Header: FC = () => {
     return (
       <ModalUI
         open
-        modalTitle="Giỏ hàng"
-        onCancel={() => setModal(false)}
+        modalTitle={renderModalCartTitle}
+        onCancel={() => {
+          setModal(false);
+          setPaymentStep(1);
+        }}
         modalColorType="purple"
-        confirmText="Thanh toán"
+        confirmText={renderConfirmCartText}
+        disableConfirm={!cartItem.length}
+        content={renderContentByStep}
+        onProceed={() => handleOnProceedCartModal()}
       />
     );
-  }, [modal]);
+  }, [
+    cartItem.length,
+    handleOnProceedCartModal,
+    modal,
+    renderConfirmCartText,
+    renderContentByStep,
+    renderModalCartTitle
+  ]);
 
   const renderPopupAccount = useMemo(
     () => (
