@@ -14,36 +14,70 @@ import { ColorPalette } from 'constants/style.constant';
 import {
   LoginFormDefaultValue,
   LoginFormValidation,
-  MockData
+  MockData,
+  UserActionModalType
 } from 'constants/user.constants';
-import { FC, useCallback, useEffect, useId, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState
+} from 'react';
 import { useForm, FieldValues, Controller } from 'react-hook-form';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import {
+  clearErr,
+  loginToExistedAccountActionRequest
+} from 'global/common/auth/auth.slice';
 import {
   LoginContainer,
   BasicFlex,
   TextUserDoing,
   LoginFormContainer,
-  AnotherOptionContainer
+  AnotherOptionContainer,
+  ErrorAPIBox
 } from './Login.style';
 import './Login.style.css';
 
-const LoginForm: FC = () => {
+interface LoginFormProps {
+  setUserActionModalType: Dispatch<SetStateAction<UserActionModalType>>;
+}
+
+const LoginForm: FC<LoginFormProps> = ({ setUserActionModalType }) => {
   const uniqueKey = useId();
   const [toggleSeePW, setToggleSeePW] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const { message, success, loading } = useAppSelector(
+    (globalState) => globalState.auth
+  );
 
   const {
     handleSubmit,
-    watch,
     formState: { errors },
     clearErrors,
     setFocus,
-    control
+    control,
+    reset
   } = useForm<FieldValues>({
     mode: 'onChange',
     defaultValues: LoginFormDefaultValue,
     resolver: yupResolver(LoginFormValidation)
   });
-  const rememberMeWatch = watch('rememberMe');
+
+  const renderErrorBox = useMemo(() => {
+    if (message) {
+      return (
+        <ErrorAPIBox itemProp={success ? 'success' : 'error'}>
+          {message}
+        </ErrorAPIBox>
+      );
+    }
+    return null;
+  }, [message, success]);
 
   const renderSuffixPassword = useMemo(
     () =>
@@ -58,11 +92,18 @@ const LoginForm: FC = () => {
   const onSubmitLogin = useCallback(
     (value: any) => {
       clearErrors();
-      if (rememberMeWatch) {
-        // TODO: handle with true case
-      }
+      dispatch(
+        loginToExistedAccountActionRequest({
+          email: value.email,
+          password: value.password,
+          onComplete: () => {
+            reset();
+            setUserActionModalType(UserActionModalType.NONE);
+          }
+        })
+      );
     },
-    [clearErrors, rememberMeWatch]
+    [clearErrors, dispatch, reset, setUserActionModalType]
   );
 
   useEffect(() => {
@@ -73,6 +114,12 @@ const LoginForm: FC = () => {
       }
     }
   }, [errors, setFocus]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearErr());
+    };
+  }, [dispatch]);
 
   return (
     <LoginContainer>
@@ -93,6 +140,7 @@ const LoginForm: FC = () => {
         Khám phá xem <b>5000+ Thành viên </b> đã dùng
         <br /> sản phẩm và quan điểm của họ
       </TextUserDoing>
+      {renderErrorBox}
       <LoginFormContainer>
         <div>
           <Controller
@@ -148,7 +196,14 @@ const LoginForm: FC = () => {
             )}
           />
 
-          <span style={{ cursor: 'pointer' }}>Quên mật khẩu</span>
+          <span
+            style={{ cursor: 'pointer' }}
+            onClick={() =>
+              setUserActionModalType(UserActionModalType.PW_RECOVER)
+            }
+          >
+            Quên mật khẩu
+          </span>
         </FlexBetween>
 
         <BasicFlex style={{ marginTop: 20 }}>
@@ -163,11 +218,19 @@ const LoginForm: FC = () => {
               letterSpacing: '0.8px'
             }}
             onClick={handleSubmit(onSubmitLogin)}
+            loading={loading}
           />
         </BasicFlex>
 
         <AnotherOptionContainer>
-          Chưa có tài khoản hãy <span>Đăng ký</span>
+          Chưa có tài khoản hãy{' '}
+          <span
+            onClick={() =>
+              setUserActionModalType(UserActionModalType.NEW_ACCOUNT)
+            }
+          >
+            Đăng ký
+          </span>
         </AnotherOptionContainer>
       </LoginFormContainer>
     </LoginContainer>

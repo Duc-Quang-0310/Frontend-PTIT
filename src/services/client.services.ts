@@ -8,6 +8,9 @@ import {
   CreateNewAccountResponse,
   DistrictData,
   DistrictResponse,
+  LoginToExistedAccountBody,
+  LoginToExistedAccountData,
+  LoginToExistedAccountResponse,
   ProvinceData,
   ProvinceResponse,
   WardData,
@@ -53,6 +56,16 @@ export const getDistrict = async (
 export const getWard = async (districtID: string): Promise<WardData> => {
   const response: WardResponse = await axios.get(
     `https://vapi.vnappmob.com/api/province/ward/${districtID}`
+  );
+  return response.data;
+};
+
+export const loginToExistedAccount = async (
+  params: CreateNewAccountBody
+): Promise<LoginToExistedAccountData> => {
+  const response: LoginToExistedAccountResponse = await request.post(
+    '/api/user/log-in',
+    params
   );
   return response.data;
 };

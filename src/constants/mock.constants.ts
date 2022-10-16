@@ -46,3 +46,34 @@ export const LIST_INFO_MOCK = [
   { label: 'window', value: 'Win 11 Home' },
   { label: 'accessory', value: 'Cable + Sạc' }
 ];
+
+export const CART = [
+  {
+    id: '1',
+    img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+    price: '19.990.000',
+    quantity: 2,
+    name: 'May tinh'
+  },
+  {
+    id: '2',
+    img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+    price: '18.990.000',
+    quantity: 2,
+    name: 'May tinh'
+  },
+  {
+    id: '3',
+    img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+    price: '17.990.000',
+    quantity: 2,
+    name: 'May tinh'
+  },
+  {
+    id: '4',
+    img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
+    price: '16.990.000',
+    quantity: 2,
+    name: 'May tinh'
+  }
+];

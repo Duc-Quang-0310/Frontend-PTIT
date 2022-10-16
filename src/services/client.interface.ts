@@ -19,6 +19,7 @@ export interface CreateNewAccountBody {
   lastName?: string;
   role?: UserRole;
   status?: UserStatus;
+  onComplete?: Function;
 }
 
 export interface CreateNewAccountDataResponse {
@@ -82,11 +83,62 @@ export type Ward =
     }[]
   | null;
 
+export type CartItem = {
+  id: string;
+  img: string;
+  price: string;
+  quantity: number;
+  name: string;
+}[];
+
+export interface LoginToExistedAccountBody {
+  email: string;
+  password: string;
+  onComplete?: Function;
+}
+
+export interface Profiles {
+  _id: string;
+  userId: string;
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  address?: string;
+  province?: string;
+  district?: string;
+  ward?: string;
+  updatedAt?: Date;
+}
+
+export interface User {
+  _id: string;
+  email: string;
+  password: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  role: UserRole;
+  status: UserStatus;
+  token?: string;
+}
+
+export interface LoginToExistedAccountData {
+  data?: {
+    userInfo: User;
+    profile: Profiles;
+  };
+  message: string;
+  accessToken?: string;
+  refreshToken?: string;
+}
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 
 export interface CheckEmailExistResponse
   extends AxiosResponse<CheckEmailExistDataResponse, any> {}
+
+export interface LoginToExistedAccountResponse
+  extends AxiosResponse<LoginToExistedAccountData, any> {}
 
 export interface ProvinceResponse extends AxiosResponse<ProvinceData, any> {}
 export interface DistrictResponse extends AxiosResponse<DistrictData, any> {}

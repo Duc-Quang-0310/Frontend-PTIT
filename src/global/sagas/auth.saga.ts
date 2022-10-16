@@ -10,14 +10,18 @@ import {
   getProvinceActionRequest,
   getWardActionComplete,
   getWardActionRequest,
-  resetAuthState
+  resetAuthState,
+  loginToExistedAccountActionComplete,
+  loginToExistedAccountActionRequest
 } from 'global/common/auth/auth.slice';
+import { setLocalStorageItem } from 'helpers/storage';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import {
   CheckEmailExistDataResponse,
   CreateNewAccountBody,
   CreateNewAccountDataResponse,
   DistrictData,
+  LoginToExistedAccountData,
   ProvinceData,
   WardData
 } from 'services/client.interface';
@@ -26,6 +30,7 @@ import {
   getDistrict,
   getProvince,
   getWard,
+  loginToExistedAccount,
   validateEmailExist
 } from 'services/client.services';
 
@@ -34,8 +39,11 @@ function* createNewAccountActionSaga(
 ) {
   try {
     yield put(resetAuthState());
+
+    const { onComplete, ...other } = action.payload;
+
     const data: CreateNewAccountDataResponse = yield call(() =>
-      createNewAccount(action.payload)
+      createNewAccount(other)
     );
     yield put(
       createNewAccountActionComplete({
@@ -43,6 +51,7 @@ function* createNewAccountActionSaga(
         success: data.success
       })
     );
+    onComplete?.();
   } catch (error: any) {
     yield put(
       createNewAccountActionComplete({
@@ -94,11 +103,6 @@ function* getDistrictActionSaga(action: PayloadAction<{ provinceId: string }>) {
     const res: DistrictData = yield call(() =>
       getDistrict(action.payload.provinceId)
     );
-    console.log(
-      '🚀 ~ file: auth.saga.ts ~ line 97 ~ function*getDistrictActionSaga ~ res',
-      res
-    );
-
     yield put(
       getDistrictActionComplete({
         data: res.results
@@ -130,12 +134,51 @@ function* getWardActionSaga(action: PayloadAction<{ districtId: string }>) {
   }
 }
 
+function* loginExistedAccountActionSaga(
+  action: PayloadAction<CreateNewAccountBody>
+) {
+  try {
+    yield put(resetAuthState());
+    const { onComplete, ...other } = action.payload;
+    const data: LoginToExistedAccountData = yield call(() =>
+      loginToExistedAccount(other)
+    );
+
+    setLocalStorageItem('token', data.accessToken);
+
+    yield put(
+      loginToExistedAccountActionComplete({
+        message: data.message,
+        success: true,
+        profile: data?.data?.profile || null,
+        refreshToken: data.refreshToken || '',
+        user: data?.data?.userInfo || null
+      })
+    );
+    onComplete?.();
+  } catch (error: any) {
+    yield put(
+      loginToExistedAccountActionComplete({
+        message: error.response.data.message,
+        success: false,
+        profile: null,
+        refreshToken: '',
+        user: null
+      })
+    );
+  }
+}
+
 export default function* authSaga() {
   yield all([
     takeLatest(createNewAccountActionRequest.type, createNewAccountActionSaga),
     takeLatest(checkEmailExistActionRequest.type, checkEmailExistActionSaga),
     takeLatest(getProvinceActionRequest.type, getProvinceActionSaga),
     takeLatest(getDistrictActionRequest.type, getDistrictActionSaga),
-    takeLatest(getWardActionRequest.type, getWardActionSaga)
+    takeLatest(getWardActionRequest.type, getWardActionSaga),
+    takeLatest(
+      loginToExistedAccountActionRequest.type,
+      loginExistedAccountActionSaga
+    )
   ]);
 }

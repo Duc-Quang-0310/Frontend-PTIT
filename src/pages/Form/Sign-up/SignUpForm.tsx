@@ -13,7 +13,8 @@ import { ColorPalette } from 'constants/style.constant';
 import {
   MockData,
   SignUpFormDefaultValue,
-  SignUpFormValidation
+  SignUpFormValidation,
+  UserActionModalType
 } from 'constants/user.constants';
 import {
   checkEmailExistActionRequest,
@@ -21,7 +22,16 @@ import {
   resetAuthState
 } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
-import { FC, useCallback, useEffect, useId, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState
+} from 'react';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import {
   AnotherOptionContainer,
@@ -31,7 +41,11 @@ import {
   LoginFormContainer
 } from '../Login/Login.style';
 
-const SignUpForm: FC = () => {
+interface SignUpFormProps {
+  setUserActionModalType: Dispatch<SetStateAction<UserActionModalType>>;
+}
+
+const SignUpForm: FC<SignUpFormProps> = ({ setUserActionModalType }) => {
   const dispatch = useAppDispatch();
   const uniqueKey = useId();
   const { message, success, loading, emailExist } = useAppSelector(
@@ -46,7 +60,8 @@ const SignUpForm: FC = () => {
     setFocus,
     control,
     watch,
-    setError
+    setError,
+    reset
   } = useForm<FieldValues>({
     mode: 'onChange',
     defaultValues: SignUpFormDefaultValue,
@@ -67,9 +82,6 @@ const SignUpForm: FC = () => {
 
   const onSubmitLogin = useCallback(
     (value: any) => {
-      if (errors) {
-        return null;
-      }
       clearErrors();
       const { email, password, firstName, lastName } = value;
       dispatch(
@@ -77,15 +89,16 @@ const SignUpForm: FC = () => {
           email,
           password,
           firstName: !firstName ? undefined : firstName,
-          lastName: !lastName ? undefined : lastName
+          lastName: !lastName ? undefined : lastName,
+          onComplete: () => reset()
         })
       );
     },
-    [clearErrors, dispatch, errors]
+    [clearErrors, dispatch, reset]
   );
 
   const renderErrorBox = useMemo(() => {
-    if (message && success) {
+    if (message) {
       return (
         <ErrorAPIBox itemProp={success ? 'success' : 'error'}>
           {message}
@@ -234,7 +247,14 @@ const SignUpForm: FC = () => {
         </FlexBetween>
         <FlexBetween style={{ paddingInline: 10 }}>
           <div />
-          <span style={{ cursor: 'pointer' }}>Quên mật khẩu</span>
+          <span
+            style={{ cursor: 'pointer' }}
+            onClick={() =>
+              setUserActionModalType(UserActionModalType.PW_RECOVER)
+            }
+          >
+            Quên mật khẩu
+          </span>
         </FlexBetween>
 
         <BasicFlex style={{ marginTop: 10 }}>
@@ -254,7 +274,12 @@ const SignUpForm: FC = () => {
         </BasicFlex>
 
         <AnotherOptionContainer>
-          Đã có tài khoản hãy <span>Đăng nhập</span>
+          Đã có tài khoản hãy{' '}
+          <span
+            onClick={() => setUserActionModalType(UserActionModalType.LOG_IN)}
+          >
+            Đăng nhập
+          </span>
         </AnotherOptionContainer>
       </LoginFormContainer>
     </LoginContainer>
