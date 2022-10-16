@@ -21,6 +21,7 @@ import {
   memo,
   ReactNode,
   useCallback,
+  useEffect,
   useId,
   useMemo,
   useState
@@ -37,6 +38,12 @@ import InputUI from 'components/Input/InputUI';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { UserActionModalType } from 'constants/user.constants';
 import {
+  setCart,
+  updateCartActionRequest
+} from 'global/common/auth/auth.slice';
+import { CART } from 'constants/mock.constants';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import {
   CartItem,
   CursorPointer,
   HeaderContainer,
@@ -48,6 +55,8 @@ import './Header.style.css';
 
 const Header: FC = () => {
   const uniqueKey = useId();
+  const dispatch = useAppDispatch();
+  const { cart } = useAppSelector((store) => store.auth);
   const [modal, setModal] = useState(false);
   const [userActionModalType, setUserActionModalType] =
     useState<UserActionModalType>(UserActionModalType.NONE);
@@ -57,7 +66,8 @@ const Header: FC = () => {
   const {
     formState: { errors },
     control,
-    handleSubmit
+    handleSubmit,
+    reset
   } = useForm<FieldValues>({
     mode: 'onChange',
     defaultValues: {
@@ -72,51 +82,24 @@ const Header: FC = () => {
     )
   });
 
-  const cartItem = useMemo(
-    () => [
-      {
-        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-        price: '19.990.000',
-        quantity: 2,
-        name: 'May tinh'
-      },
-      {
-        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-        price: '19.990.000',
-        quantity: 2,
-        name: 'May tinh'
-      },
-      {
-        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-        price: '19.990.000',
-        quantity: 2,
-        name: 'May tinh'
-      },
-      {
-        img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-        price: '19.990.000',
-        quantity: 2,
-        name: 'May tinh'
-      }
-    ],
-    []
+  const handleOnClickSubmit = useCallback(
+    (value: any) => {
+      setPaymentStep(3);
+      reset();
+    },
+    [reset]
   );
 
-  const handleOnClickSubmit = useCallback((value: any) => {
-    //
-    setPaymentStep(3);
-  }, []);
-
   const renderContentByStep = useMemo(() => {
-    if (cartItem.length === 0) {
+    if (cart.length === 0) {
       return <EmptyUI />;
     }
 
     if (paymentStep === 1) {
       return (
         <ScrollableCart>
-          {cartItem?.map((item, index) => (
-            <CartItem key={item.quantity + index}>
+          {cart?.map((item, index) => (
+            <CartItem key={item.quantity + index + item.price}>
               <div className="imgContainer">
                 <img src={item.img} alt={item.name} />
               </div>
@@ -126,9 +109,31 @@ const Header: FC = () => {
                 <div className="footer">
                   <FlexBetween>
                     <div className="btnCombination">
-                      <PlusCircleTwoTone twoToneColor={ColorPalette.green_16} />
+                      <PlusCircleTwoTone
+                        twoToneColor={ColorPalette.green_16}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() =>
+                          dispatch(
+                            updateCartActionRequest({
+                              id: item.id,
+                              actionType: 'add'
+                            })
+                          )
+                        }
+                      />
                       <span>{item.quantity}</span>
-                      <MinusCircleTwoTone twoToneColor={ColorPalette.red_11} />
+                      <MinusCircleTwoTone
+                        twoToneColor={ColorPalette.red_11}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() =>
+                          dispatch(
+                            updateCartActionRequest({
+                              id: item.id,
+                              actionType: 'minus'
+                            })
+                          )
+                        }
+                      />
                     </div>
                     <span
                       style={{ fontWeight: '600', color: ColorPalette.red_4 }}
@@ -184,7 +189,7 @@ const Header: FC = () => {
           />
 
           <ScrollableCart itemProp="250px" style={{ marginTop: 25 }}>
-            {cartItem?.map((item, index) => (
+            {cart?.map((item, index) => (
               <CartItem key={item.quantity + index}>
                 <div className="imgContainer">
                   <img src={item.img} alt={item.name} />
@@ -195,13 +200,7 @@ const Header: FC = () => {
                   <div className="footer">
                     <FlexBetween>
                       <div className="btnCombination">
-                        <PlusCircleTwoTone
-                          twoToneColor={ColorPalette.green_16}
-                        />
-                        <span>{item.quantity}</span>
-                        <MinusCircleTwoTone
-                          twoToneColor={ColorPalette.red_11}
-                        />
+                        <span>Số lượng: {item.quantity}</span>
                       </div>
                       <span
                         style={{ fontWeight: '600', color: ColorPalette.red_4 }}
@@ -225,7 +224,7 @@ const Header: FC = () => {
         subTitle="Bạn hãy đợi nhân viên của chúng tôi liên lạc trong khoảng thời gian gần nhất"
       />
     );
-  }, [cartItem, control, paymentStep, errors]);
+  }, [cart, control, paymentStep, errors]);
 
   const handleOnProceedCartModal = useCallback(() => {
     if (paymentStep === 1) {
@@ -288,21 +287,23 @@ const Header: FC = () => {
         onCancel={() => {
           setModal(false);
           setPaymentStep(1);
+          reset();
         }}
         modalColorType="purple"
         confirmText={renderConfirmCartText}
-        disableConfirm={!cartItem.length}
+        disableConfirm={!cart.length}
         content={renderContentByStep}
         onProceed={() => handleOnProceedCartModal()}
       />
     );
   }, [
-    cartItem.length,
+    cart.length,
     handleOnProceedCartModal,
     modal,
     renderConfirmCartText,
     renderContentByStep,
-    renderModalCartTitle
+    renderModalCartTitle,
+    reset
   ]);
 
   const renderPopupAccount = useMemo(
@@ -368,6 +369,10 @@ const Header: FC = () => {
   const handleRedirectHome = useCallback(() => {
     navigate('/');
   }, [navigate]);
+
+  useEffect(() => {
+    dispatch(setCart({ data: CART }));
+  }, [dispatch]);
 
   return (
     <>

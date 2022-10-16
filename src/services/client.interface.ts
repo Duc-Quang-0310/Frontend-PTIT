@@ -82,6 +82,14 @@ export type Ward =
     }[]
   | null;
 
+export type CartItem = {
+  id: string;
+  img: string;
+  price: string;
+  quantity: number;
+  name: string;
+}[];
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 

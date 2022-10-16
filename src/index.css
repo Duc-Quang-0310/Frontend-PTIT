@@ -69,3 +69,7 @@
   gap: 12px;
   align-items: center;
 }
+
+.btnCombination span {
+  user-select: none;
+}
