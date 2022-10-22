@@ -167,6 +167,7 @@ export interface Laptop {
   productName: string;
   sku: string;
   productImg: string[];
+  price: string;
 }
 
 export enum PaginationSize {
@@ -198,6 +199,7 @@ export interface WardResponse extends AxiosResponse<WardData, any> {}
 export interface ListProfileResponse extends AxiosResponse<Profiles[], any> {}
 export interface LaptopListResponse
   extends AxiosResponse<{ data: Laptop[] }, any> {}
-export interface LaptopDetailResponse extends AxiosResponse<Laptop, any> {}
+export interface LaptopDetailResponse
+  extends AxiosResponse<{ laptop: Laptop }, any> {}
 export interface LaptopPaginationResponse
   extends AxiosResponse<Laptop[], any> {}

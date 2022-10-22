@@ -101,5 +101,5 @@ export const getListLaptopPaginate = async ({
 
 export const getDetailLaptop = async (id: string): Promise<Laptop> => {
   const response: LaptopDetailResponse = await request.get(`/api/laptop/${id}`);
-  return response.data;
+  return response.data.laptop;
 };

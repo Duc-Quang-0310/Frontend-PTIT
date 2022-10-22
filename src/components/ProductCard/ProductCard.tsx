@@ -1,3 +1,4 @@
+import { RiseOutlined } from '@ant-design/icons';
 import HeartOutlined from '@ant-design/icons/lib/icons/HeartOutlined';
 import MoreOutlined from '@ant-design/icons/lib/icons/MoreOutlined';
 import ShoppingCartOutlined from '@ant-design/icons/lib/icons/ShoppingCartOutlined';
@@ -14,6 +15,8 @@ import {
   useMemo,
   useCallback
 } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { routerPaths } from 'router/router.paths';
 import {
   ProductCardContainer,
   ImageWrap,
@@ -31,6 +34,7 @@ interface ProductCardProps extends HTMLAttributes<HTMLDivElement> {
   loading?: boolean;
   rateStar?: number;
   disabledStar?: boolean;
+  id: string;
 }
 
 const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
@@ -42,9 +46,11 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
     loading,
     rateStar,
     disabledStar = false,
+    id = '',
     ...other
   } = props;
   const uniqueId = useId();
+  const navigate = useNavigate();
 
   const handleClickOnFavorite = useCallback(() => {
     //
@@ -53,6 +59,11 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
   const handleClickOnCart = useCallback(() => {
     //
   }, []);
+
+  const handleClickDetail = useCallback(
+    () => id && navigate(routerPaths.LAPTOP_DETAIL(id)),
+    [id, navigate]
+  );
 
   const tooltipMoreMemo = useMemo(() => {
     if (!productLink) {
@@ -63,7 +74,7 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
         <StackUI
           width={160}
           icon={<HeartOutlined />}
-          content="Thêm  ưa thích"
+          content="Thêm ưa thích"
           onClick={handleClickOnFavorite}
         />
         <StackUI
@@ -72,9 +83,20 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
           content="Thêm giỏ hàng"
           onClick={handleClickOnCart}
         />
+        <StackUI
+          width={160}
+          icon={<RiseOutlined />}
+          content="Xem chi tiết"
+          onClick={handleClickDetail}
+        />
       </>
     );
-  }, [handleClickOnCart, handleClickOnFavorite, productLink]);
+  }, [
+    handleClickOnCart,
+    handleClickOnFavorite,
+    productLink,
+    handleClickDetail
+  ]);
 
   return (
     <ProductCardContainer

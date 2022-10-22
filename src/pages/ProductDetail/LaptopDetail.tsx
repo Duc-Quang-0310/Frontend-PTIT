@@ -6,7 +6,13 @@ import GlobalIcon from 'components/Images/GlobalIcon';
 import ShieldIcon from 'components/Images/ShieldIcon';
 import ModalUI from 'components/Modal/ModalUI';
 import Rating from 'components/Rating/Rating';
+import { UPDATE } from 'constants/mock.constants';
 import { ColorPalette } from 'constants/style.constant';
+import {
+  getLaptopDetailComplete,
+  getLaptopDetailRequest
+} from 'global/common/laptop/laptop.slice';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import {
   FC,
   CSSProperties,
@@ -14,7 +20,8 @@ import {
   useMemo,
   useCallback,
   useState,
-  useId
+  useId,
+  useEffect
 } from 'react';
 import { useParams } from 'react-router-dom';
 import ModalListProductImg from './components/ModalListProductImg';
@@ -46,8 +53,16 @@ const RatingStyle: CSSProperties = {
 const LaptopDetail: FC = () => {
   const id = useId();
   const params = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
+  const { laptopDetail } = useAppSelector((state) => state.laptop);
   const [, startTransition] = useTransition();
-  const imgList = useMemo(() => [0, 1, 2, 3, 4], []);
+  const imgList = useMemo(
+    () =>
+      laptopDetail && laptopDetail?.productImg?.length
+        ? laptopDetail?.productImg
+        : [],
+    [laptopDetail]
+  );
   const [imgIndex, setImgIndex] = useState(0);
   const [openModalImg, setOpenModalImg] = useState(false);
   const HASH = 160;
@@ -105,16 +120,27 @@ const LaptopDetail: FC = () => {
     );
   }, [imgIndex, imgList, openModalImg]);
 
+  useEffect(() => {
+    if (params?.id) {
+      dispatch(getLaptopDetailRequest(params.id));
+    }
+    return () => {
+      dispatch(getLaptopDetailComplete(null));
+    };
+  }, [dispatch, params.id]);
+
   return (
     <LaptopDetailContainer>
       <ImageContainer>
         <div className="carousel">
-          {imgList?.slice(0, 4)?.map((_img, index) => (
+          {imgList?.slice(0, 4)?.map((img, index) => (
             <div
               className={`item  ${imgIndex === index ? 'active' : ''} `}
               key={id + index}
               onClick={() => handleClickOnImg(index)}
-            />
+            >
+              <img src={img} alt={img} />
+            </div>
           ))}
 
           <ButtonUI
@@ -124,10 +150,12 @@ const LaptopDetail: FC = () => {
             onClick={() => setOpenModalImg(true)}
           />
         </div>
-        <div className="imageHero">{imgList[imgIndex]}</div>
+        <div className="imageHero">
+          <img src={imgList[imgIndex]} alt={imgList[imgIndex]} />
+        </div>
       </ImageContainer>
       <DetailInfoContainer>
-        <h3>Jenny’s Closets - The winter top for female, green</h3>
+        <h3>{laptopDetail?.productName || UPDATE}</h3>
         <FlexBasic style={RatingStyle}>
           <Rating
             defaultValue={5}
@@ -136,18 +164,18 @@ const LaptopDetail: FC = () => {
           />
           <span style={{ color: ColorPalette.gray_8 }}>160 Lượt đánh giá</span>
         </FlexBasic>
-        <h4>16.999.000 đ</h4>
+        <h4>{laptopDetail?.price || UPDATE}</h4>
         <InfoBodyWrapper>
           <p>Thông số sản phẩm: </p>
           <ul>
-            <li>CPU: Intel core i5 11400H </li>
-            <li>RAM: 8GB</li>
-            <li>Ổ cứng: 512GB SSD</li>
-            <li>VGA: NVIDIA GTX1650 4G</li>
-            <li>Màn hình: 15.6 inch FHD 144Hz</li>
-            <li>Bàn phím: có led</li>
-            <li>Hệ điều hành: Win 11</li>
-            <li>Màu: Đen</li>
+            <li>CPU: {laptopDetail?.cpu || UPDATE}</li>
+            <li>RAM: {laptopDetail?.ram || UPDATE}</li>
+            <li>Ổ cứng: {laptopDetail?.disk || UPDATE}</li>
+            <li>VGA: {laptopDetail?.vga || UPDATE}</li>
+            <li>Màn hình: {laptopDetail?.screen || UPDATE}</li>
+            <li>Bàn phím: {laptopDetail?.keyboard || UPDATE}</li>
+            <li>Hệ điều hành: {laptopDetail?.window || UPDATE}</li>
+            <li>Màu: {laptopDetail?.color || UPDATE}</li>
           </ul>
         </InfoBodyWrapper>
         <FlexBasic style={{ marginTop: 40 }}>

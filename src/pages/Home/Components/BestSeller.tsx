@@ -2,28 +2,34 @@ import { Col, Row } from 'antd';
 import ProductCard from 'components/ProductCard/ProductCard';
 import { useLaptop } from 'hooks/useLaptop';
 import { FC, memo, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { routerPaths } from 'router/router.paths';
 import { BestSellerContainer } from '../style/BestSeller';
 
 const MOCK_DATA = [
   {
+    id: '',
     price: '16.999.000',
     productLink:
       'https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg',
     title: 'Orange'
   },
   {
+    id: '',
     price: '16.999.000',
     productLink:
       'https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg',
     title: 'Orange'
   },
   {
+    id: '',
     price: '16.999.000',
     productLink:
       'https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg',
     title: 'Orange'
   },
   {
+    id: '',
     price: '16.999.000',
     productLink:
       'https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg',
@@ -41,7 +47,8 @@ const BestSeller: FC = () => {
         productLink:
           laptop?.productImg?.[0] ||
           'https://crast.net/img/2022/09/The-14-inch-MacBook-Pro-sinks-its-price-on-Amazon.jpg',
-        title: laptop?.productName
+        title: laptop?.productName,
+        id: laptop?._id || ''
       }));
     }
     return MOCK_DATA;
@@ -57,11 +64,11 @@ const BestSeller: FC = () => {
           justifyContent: 'center'
         }}
       >
-        {convertedData.map(({ price, productLink, title }, index) => (
+        {convertedData.map(({ price, productLink, title, id }, index) => (
           <Col
             key={`${price}${productLink}${title}${index}`}
             xxl={6}
-            style={{ marginTop: 30 }}
+            style={{ marginTop: 30, cursor: 'pointer' }}
           >
             <ProductCard
               price={price}
@@ -69,6 +76,7 @@ const BestSeller: FC = () => {
               title={title}
               disabledStar
               rateStar={5}
+              id={id}
             />
           </Col>
         ))}
