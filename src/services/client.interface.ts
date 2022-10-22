@@ -108,6 +108,7 @@ export interface Profiles {
   district?: string;
   ward?: string;
   updatedAt?: Date;
+  avatar?: string;
 }
 
 export interface User {
@@ -131,6 +132,57 @@ export interface LoginToExistedAccountData {
   refreshToken?: string;
 }
 
+export interface Laptop {
+  _id: string;
+  laptopID?: string;
+  brand?: string;
+  type?: string;
+  partNumber?: string;
+  color?: string;
+  chip?: string;
+  chipSet?: string;
+  rom?: string;
+  connector?: string;
+  ram?: string;
+  vga?: string;
+  disk?: string;
+  lightDisk?: string;
+  cardReader?: string;
+  technology?: string;
+  screen?: string;
+  webcam?: string;
+  audio?: string;
+  internet?: string;
+  noWires?: string;
+  connectionPort?: string;
+  battery?: string;
+  size?: string;
+  weight?: string;
+  window?: string;
+  accessory?: string;
+  updatedAt?: Date;
+  review?: string;
+  cpu: string;
+  keyboard: string;
+  productName: string;
+  sku: string;
+  productImg: string[];
+}
+
+export enum PaginationSize {
+  FIVE = '5',
+  TEN = '10',
+  FIFTEEN = '15',
+  TWENTY = '20',
+  FIFTY = '50',
+  HUNDRED = '100'
+}
+
+export interface GetListLaptopPaginateBody {
+  page: string;
+  size: PaginationSize;
+}
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 
@@ -143,3 +195,8 @@ export interface LoginToExistedAccountResponse
 export interface ProvinceResponse extends AxiosResponse<ProvinceData, any> {}
 export interface DistrictResponse extends AxiosResponse<DistrictData, any> {}
 export interface WardResponse extends AxiosResponse<WardData, any> {}
+export interface ListProfileResponse extends AxiosResponse<Profiles[], any> {}
+export interface LaptopListResponse extends AxiosResponse<Laptop[], any> {}
+export interface LaptopDetailResponse extends AxiosResponse<Laptop, any> {}
+export interface LaptopPaginationResponse
+  extends AxiosResponse<Laptop[], any> {}

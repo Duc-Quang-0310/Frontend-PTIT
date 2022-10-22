@@ -21,6 +21,7 @@ export interface AuthState {
   token: string;
   user: User | null;
   profile: Profiles | null;
+  listProfileImgs: string[];
 }
 
 const initialState: AuthState = {
@@ -34,7 +35,8 @@ const initialState: AuthState = {
   cart: [],
   token: '',
   user: null,
-  profile: null
+  profile: null,
+  listProfileImgs: []
 };
 
 export const authSlice = createSlice({
@@ -69,7 +71,8 @@ export const authSlice = createSlice({
       cart: [],
       token: '',
       user: null,
-      profile: null
+      profile: null,
+      listProfileImgs: []
     }),
     checkEmailExistActionRequest: (
       state: AuthState,
@@ -231,6 +234,18 @@ export const authSlice = createSlice({
       loading: false,
       success: null,
       message: ''
+    }),
+    getListImgProfileRequest: (state: AuthState) => ({
+      ...state,
+      loading: true
+    }),
+    getListImgProfileComplete: (
+      state: AuthState,
+      action: PayloadAction<string[]>
+    ) => ({
+      ...state,
+      listProfileImgs: action.payload,
+      loading: false
     })
   }
 });
@@ -251,7 +266,9 @@ export const {
   setCart,
   loginToExistedAccountActionRequest,
   loginToExistedAccountActionComplete,
-  clearErr
+  clearErr,
+  getListImgProfileRequest,
+  getListImgProfileComplete
 } = authSlice.actions;
 
 export default authSlice.reducer;
