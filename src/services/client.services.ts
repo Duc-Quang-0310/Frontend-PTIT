@@ -8,9 +8,14 @@ import {
   CreateNewAccountResponse,
   DistrictData,
   DistrictResponse,
-  LoginToExistedAccountBody,
+  GetListLaptopPaginateBody,
+  Laptop,
+  LaptopDetailResponse,
+  LaptopListResponse,
+  ListProfileResponse,
   LoginToExistedAccountData,
   LoginToExistedAccountResponse,
+  Profiles,
   ProvinceData,
   ProvinceResponse,
   WardData,
@@ -67,5 +72,32 @@ export const loginToExistedAccount = async (
     '/api/user/log-in',
     params
   );
+  return response.data;
+};
+
+export const getAllProfile = async (): Promise<Profiles[]> => {
+  const response: ListProfileResponse = await request.post(
+    '/api/user/get-all-profile'
+  );
+  return response.data;
+};
+
+export const getListLaptop = async (): Promise<Laptop[]> => {
+  const response: LaptopListResponse = await request.get('/api/laptop');
+  return response.data;
+};
+
+export const getListLaptopPaginate = async ({
+  page,
+  size
+}: GetListLaptopPaginateBody): Promise<Laptop[]> => {
+  const response: LaptopListResponse = await request.get(
+    `/api/laptop/pagination?page=${page}&size=${size}`
+  );
+  return response.data;
+};
+
+export const getDetailLaptop = async (id: string): Promise<Laptop> => {
+  const response: LaptopDetailResponse = await request.get(`/api/laptop/${id}`);
   return response.data;
 };

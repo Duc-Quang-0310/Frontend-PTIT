@@ -12,7 +12,9 @@ import {
   getWardActionRequest,
   resetAuthState,
   loginToExistedAccountActionComplete,
-  loginToExistedAccountActionRequest
+  loginToExistedAccountActionRequest,
+  getListImgProfileComplete,
+  getListImgProfileRequest
 } from 'global/common/auth/auth.slice';
 import { setLocalStorageItem } from 'helpers/storage';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
@@ -22,11 +24,13 @@ import {
   CreateNewAccountDataResponse,
   DistrictData,
   LoginToExistedAccountData,
+  Profiles,
   ProvinceData,
   WardData
 } from 'services/client.interface';
 import {
   createNewAccount,
+  getAllProfile,
   getDistrict,
   getProvince,
   getWard,
@@ -169,6 +173,21 @@ function* loginExistedAccountActionSaga(
   }
 }
 
+function* getListProfileSaga() {
+  try {
+    const res: Profiles[] = yield call(() => getAllProfile());
+    const listImg = res?.map(
+      (each) =>
+        each.avatar ||
+        'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8NXx8fGVufDB8fHx8&w=1000&q=80'
+    );
+
+    yield put(getListImgProfileComplete(listImg));
+  } catch (error) {
+    yield put(getListImgProfileComplete([]));
+  }
+}
+
 export default function* authSaga() {
   yield all([
     takeLatest(createNewAccountActionRequest.type, createNewAccountActionSaga),
@@ -179,6 +198,7 @@ export default function* authSaga() {
     takeLatest(
       loginToExistedAccountActionRequest.type,
       loginExistedAccountActionSaga
-    )
+    ),
+    takeLatest(getListImgProfileRequest.type, getListProfileSaga)
   ]);
 }
