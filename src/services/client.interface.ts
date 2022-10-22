@@ -196,7 +196,8 @@ export interface ProvinceResponse extends AxiosResponse<ProvinceData, any> {}
 export interface DistrictResponse extends AxiosResponse<DistrictData, any> {}
 export interface WardResponse extends AxiosResponse<WardData, any> {}
 export interface ListProfileResponse extends AxiosResponse<Profiles[], any> {}
-export interface LaptopListResponse extends AxiosResponse<Laptop[], any> {}
+export interface LaptopListResponse
+  extends AxiosResponse<{ data: Laptop[] }, any> {}
 export interface LaptopDetailResponse extends AxiosResponse<Laptop, any> {}
 export interface LaptopPaginationResponse
   extends AxiosResponse<Laptop[], any> {}

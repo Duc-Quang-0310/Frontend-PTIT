@@ -1,6 +1,7 @@
 import { Col, Row } from 'antd';
 import ProductCard from 'components/ProductCard/ProductCard';
-import { FC, memo } from 'react';
+import { useLaptop } from 'hooks/useLaptop';
+import { FC, memo, useMemo } from 'react';
 import { BestSellerContainer } from '../style/BestSeller';
 
 const MOCK_DATA = [
@@ -31,6 +32,21 @@ const MOCK_DATA = [
 ];
 
 const BestSeller: FC = () => {
+  const { randomProduct } = useLaptop();
+
+  const convertedData = useMemo(() => {
+    if (randomProduct) {
+      return randomProduct.map((laptop) => ({
+        price: '16.999.000',
+        productLink:
+          laptop?.productImg?.[0] ||
+          'https://crast.net/img/2022/09/The-14-inch-MacBook-Pro-sinks-its-price-on-Amazon.jpg',
+        title: laptop?.productName
+      }));
+    }
+    return MOCK_DATA;
+  }, [randomProduct]);
+
   return (
     <BestSellerContainer key={BestSellerContainer}>
       <h2>Sản phẩm bán chạy</h2>
@@ -41,7 +57,7 @@ const BestSeller: FC = () => {
           justifyContent: 'center'
         }}
       >
-        {MOCK_DATA.map(({ price, productLink, title }, index) => (
+        {convertedData.map(({ price, productLink, title }, index) => (
           <Col
             key={`${price}${productLink}${title}${index}`}
             xxl={6}
