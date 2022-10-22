@@ -5,6 +5,7 @@ import {
   forwardRef,
   HTMLAttributes,
   memo,
+  ReactNode,
   useCallback,
   useId,
   useMemo
@@ -26,7 +27,7 @@ import {
 interface CardUIProps extends HTMLAttributes<HTMLDivElement> {
   imgLink: string;
   title: string;
-  body?: string;
+  body?: string | ReactNode;
   status?: string;
   date?: Date | string;
   loading?: boolean;
@@ -44,6 +45,7 @@ const CardUI = forwardRef<any, CardUIProps>((props, ref) => {
     ...other
   } = props;
   const uniqueKey = useId();
+
   const renderStaticInfo = useMemo(() => {
     if (!status && !date) {
       return <span>Xem chi tiết</span>;
@@ -51,7 +53,7 @@ const CardUI = forwardRef<any, CardUIProps>((props, ref) => {
 
     return (
       <>
-        <span>{status}</span>
+        <span style={{ color: ColorPalette.green_1 }}>{status}</span>
         <Dot itemProp={ColorPalette.gray_3_1} />
         <span>{moment(date).format('Do MMM YYYY')}</span>
       </>

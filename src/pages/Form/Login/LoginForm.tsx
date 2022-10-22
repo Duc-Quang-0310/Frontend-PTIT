@@ -10,6 +10,7 @@ import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { Logo } from 'components/Images/Logo';
 import { yupResolver } from '@hookform/resolvers/yup';
 import InputUI from 'components/Input/InputUI';
+import _ from 'lodash';
 import { ColorPalette } from 'constants/style.constant';
 import {
   LoginFormDefaultValue,
@@ -31,6 +32,7 @@ import { useForm, FieldValues, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import {
   clearErr,
+  getListImgProfileRequest,
   loginToExistedAccountActionRequest
 } from 'global/common/auth/auth.slice';
 import {
@@ -54,6 +56,14 @@ const LoginForm: FC<LoginFormProps> = ({ setUserActionModalType }) => {
   const { message, success, loading } = useAppSelector(
     (globalState) => globalState.auth
   );
+  const { listProfileImgs } = useAppSelector((store) => store.auth);
+
+  const mappedImg = useMemo(() => {
+    if (listProfileImgs.length) {
+      return _.sampleSize(listProfileImgs, 7);
+    }
+    return MockData;
+  }, [listProfileImgs]);
 
   const {
     handleSubmit,
@@ -116,6 +126,7 @@ const LoginForm: FC<LoginFormProps> = ({ setUserActionModalType }) => {
   }, [errors, setFocus]);
 
   useEffect(() => {
+    dispatch(getListImgProfileRequest());
     return () => {
       dispatch(clearErr());
     };
@@ -128,9 +139,9 @@ const LoginForm: FC<LoginFormProps> = ({ setUserActionModalType }) => {
         <Logo blockWidth={180} blockHeight={60} />
       </BasicFlex>
       <Avatar.Group style={{ marginTop: 15, marginBottom: 12 }}>
-        {MockData.map((each, index) => (
+        {mappedImg.map((each, index) => (
           <Avatar
-            src={each.link}
+            src={each}
             key={uniqueKey + index}
             style={{ height: 45, width: 45 }}
           />

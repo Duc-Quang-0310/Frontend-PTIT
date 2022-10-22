@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import request from './axios.connection';
 import {
   CheckEmailExistDataResponse,
@@ -76,15 +76,17 @@ export const loginToExistedAccount = async (
 };
 
 export const getAllProfile = async (): Promise<Profiles[]> => {
-  const response: ListProfileResponse = await request.post(
+  const response: ListProfileResponse = await request.get(
     '/api/user/get-all-profile'
   );
   return response.data;
 };
 
-export const getListLaptop = async (): Promise<Laptop[]> => {
-  const response: LaptopListResponse = await request.get('/api/laptop');
-  return response.data;
+export const getListLaptop = async (
+  option?: AxiosRequestConfig
+): Promise<Laptop[]> => {
+  const response: LaptopListResponse = await request.get('/api/laptop', option);
+  return response.data.data;
 };
 
 export const getListLaptopPaginate = async ({
@@ -94,7 +96,7 @@ export const getListLaptopPaginate = async ({
   const response: LaptopListResponse = await request.get(
     `/api/laptop/pagination?page=${page}&size=${size}`
   );
-  return response.data;
+  return response.data.data;
 };
 
 export const getDetailLaptop = async (id: string): Promise<Laptop> => {
