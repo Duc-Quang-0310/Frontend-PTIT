@@ -77,3 +77,5 @@ export const CART = [
     name: 'May tinh'
   }
 ];
+
+export const UPDATE = 'Đang cập nhật';

@@ -1,9 +1,9 @@
 import { Image } from 'antd';
-import { FC, useCallback, useId, useState } from 'react';
+import { FC, memo, useCallback, useId, useState } from 'react';
 import { LaptopListImgContainer } from '../style/LaptopDetail';
 
 interface ModalListProductImgProps {
-  imgList: number[];
+  imgList: string[];
   focusIndex: number;
 }
 
@@ -29,14 +29,14 @@ const ModalListProductImg: FC<ModalListProductImgProps> = ({
     <LaptopListImgContainer key={id}>
       <div className="imgHero">
         <Image
-          src={TEMP[currentImgIndex]}
+          src={imgList[currentImgIndex]}
           height={500}
           width={500}
           className="currentImg"
         />
       </div>
       <div className="imgList">
-        {TEMP?.map((childImg, index) => (
+        {imgList?.map((childImg, index) => (
           <div
             className={`imgItem ${currentImgIndex === index ? 'active' : ''}`}
             key={`product+${index}+${id}`}
@@ -50,4 +50,4 @@ const ModalListProductImg: FC<ModalListProductImgProps> = ({
   );
 };
 
-export default ModalListProductImg;
+export default memo(ModalListProductImg);

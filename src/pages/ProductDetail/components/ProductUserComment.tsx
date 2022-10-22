@@ -3,7 +3,7 @@ import TextArea from 'antd/lib/input/TextArea';
 import * as Yup from 'yup';
 import CommentCard from 'components/commentCard/CommentCard';
 import ButtonUI from 'components/Button/ButtonUI';
-import { FC, useId, useMemo, useCallback, useEffect } from 'react';
+import { FC, useId, useMemo, useCallback, useEffect, memo } from 'react';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { Rate } from 'antd';
 import { FieldValues, useForm, Controller } from 'react-hook-form';
@@ -113,4 +113,4 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
   );
 };
 
-export default ProductUserComment;
+export default memo(ProductUserComment);
