@@ -7,6 +7,7 @@ import { routerPaths } from './router.paths';
 const Home = lazy(() => import('../pages/Home/Home'));
 const LaptopDetail = lazy(() => import('../pages/ProductDetail/LaptopDetail'));
 const UserProfile = lazy(() => import('../pages/profile/UserProfile'));
+const ProductList = lazy(() => import('../pages/ProductList/ProductList'));
 
 export const listRouters: RouterInterface[] = [
   {
@@ -20,5 +21,9 @@ export const listRouters: RouterInterface[] = [
   {
     component: <SuspenseComp child={<UserProfile />} />,
     path: routerPaths.USER_PROFILE()
+  },
+  {
+    component: <SuspenseComp child={<ProductList />} />,
+    path: routerPaths.PRODUCT_LIST
   }
 ];
