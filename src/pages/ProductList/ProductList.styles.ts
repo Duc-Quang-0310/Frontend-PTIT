@@ -56,6 +56,8 @@ export const ProductCardItem = styled.div`
   padding-inline: 1.5rem;
   padding-block: 2rem;
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   img {
     width: 250px;
@@ -69,7 +71,7 @@ export const ProductCardItem = styled.div`
   .product-price {
     font-weight: 600;
     font-size: 18px;
-    margin-top: 2px;
+    margin-top: auto;
   }
 
   .anticon-heart {
@@ -126,6 +128,10 @@ export const ProductListContainer = styled.div`
         color: #40a9ff;
       }
     }
+  }
+
+  .hidden {
+    visibility: hidden;
   }
 `;
 

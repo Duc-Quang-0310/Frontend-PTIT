@@ -77,7 +77,9 @@ export const authSlice = createSlice({
       token: '',
       user: null,
       profile: null,
-      listProfileImgs: []
+      listProfileImgs: [],
+      internalLoading: false,
+      favoriteItem: []
     }),
     checkEmailExistActionRequest: (
       state: AuthState,

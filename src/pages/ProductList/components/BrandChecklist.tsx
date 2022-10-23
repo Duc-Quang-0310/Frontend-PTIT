@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from 'react';
 import { Checkbox } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
@@ -17,9 +24,6 @@ const BrandChecklist = ({
   checkedList,
   setCheckedList
 }: BrandChecklistProps) => {
-  const [indeterminate, setIndeterminate] = useState(true);
-  const [checkAll, setCheckAll] = useState(false);
-
   const { allLaptop } = useAppSelector((store) => store.laptop);
 
   const listBrand = useMemo(() => {
@@ -28,29 +32,30 @@ const BrandChecklist = ({
         (laptop) => laptop.brand
       );
     }
-
     return [];
   }, [allLaptop]);
 
   const onChange = (list: CheckboxValueType[]) => {
     setCheckedList(list);
-    setIndeterminate(!!list.length && list.length < listBrand.length);
-    setCheckAll(list.length === listBrand.length);
   };
 
   const onCheckAllChange = (e: CheckboxChangeEvent) => {
     setCheckedList(e.target.checked ? (listBrand as string[]) : []);
-    setIndeterminate(false);
-    setCheckAll(e.target.checked);
   };
+
+  useEffect(() => {
+    if (listBrand.length) {
+      setCheckedList(listBrand as string[]);
+    }
+  }, [listBrand, setCheckedList]);
 
   return (
     <BrandListContainer>
       <div className="title">Hãng</div>
       <Checkbox
-        indeterminate={indeterminate}
+        indeterminate={checkedList.length >= 1}
         onChange={onCheckAllChange}
-        checked={checkAll}
+        checked={checkedList.length === listBrand.length}
       >
         Tất cả
       </Checkbox>

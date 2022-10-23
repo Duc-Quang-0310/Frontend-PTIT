@@ -1,6 +1,14 @@
 import { Input } from 'antd';
 import { SearchProps } from 'antd/lib/input';
-import { memo } from 'react';
+import { debounce } from 'lodash';
+import {
+  ChangeEvent,
+  Dispatch,
+  memo,
+  SetStateAction,
+  useCallback
+} from 'react';
+import { Laptop } from 'services/client.interface';
 import {
   ProductListSearchBar,
   ProductListSearchInfo
@@ -8,16 +16,37 @@ import {
 
 const { Search } = Input;
 
-interface SearchBarProps extends SearchProps {}
+interface SearchBarProps extends SearchProps {
+  searchValue: string;
+  setSearchValue: Dispatch<SetStateAction<string>>;
+  totalValue: number;
+}
 
-const SearchBar = ({ ...props }: SearchBarProps) => {
+const SearchBar = ({
+  searchValue,
+  setSearchValue,
+  totalValue,
+  ...props
+}: SearchBarProps) => {
+  const handleChangeSearchInput = useCallback(
+    debounce((e: ChangeEvent<HTMLInputElement>) => {
+      setSearchValue(e.target.value);
+    }, 400),
+    [setSearchValue]
+  );
+
   return (
     <ProductListSearchInfo>
-      <div className="search-res">
-        Tìm thấy length kết quả cho <span>abc</span>
+      <div className={`search-res ${searchValue ? '' : 'hidden'}`}>
+        Tìm thấy {totalValue} kết quả cho <span>{searchValue}</span>
       </div>
       <ProductListSearchBar>
-        <Search allowClear {...props} />
+        <Search
+          allowClear
+          // value={searchValue}
+          onChange={handleChangeSearchInput}
+          {...props}
+        />
       </ProductListSearchBar>
     </ProductListSearchInfo>
   );

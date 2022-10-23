@@ -1,10 +1,9 @@
-import { Divider, Pagination, Spin } from 'antd';
-import { PaginationSize } from 'services/client.interface';
+import { Divider, Pagination } from 'antd';
+import { Laptop, PaginationSize } from 'services/client.interface';
+import EmptyUI from 'components/Empty/EmptyUI';
 import {
   getAllLaptopComplete,
-  getAllLaptopRequest,
-  getPaginationLaptopComplete,
-  getPaginationLaptopRequest
+  getAllLaptopRequest
 } from 'global/common/laptop/laptop.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { useEffect, useMemo, useState } from 'react';
@@ -23,13 +22,9 @@ const ProductList = () => {
     pageSize: parseInt(PaginationSize.FIFTEEN, 10)
   });
   const [checkedList, setCheckedList] = useState<CheckboxValueType[]>([]);
-  console.log('checkedList', checkedList);
-
+  const [searchValue, setSearchValue] = useState<string>('');
   const dispatch = useAppDispatch();
-  const { allLaptop, laptopListPaginate } = useAppSelector(
-    (store) => store.laptop
-  );
-  console.log('laptopListPaginate', laptopListPaginate);
+  const { allLaptop } = useAppSelector((store) => store.laptop);
 
   const handleChangePagination = (page: number, pageSize: number) => {
     setPageInfo({ page, pageSize });
@@ -43,31 +38,37 @@ const ProductList = () => {
     return listLabel;
   }, []);
 
+  const productListByFilter = useMemo(() => {
+    const resByFilter: Laptop[] = [];
+    allLaptop.forEach((laptopItem: Laptop) => {
+      checkedList.forEach((brandItem: CheckboxValueType) => {
+        if (laptopItem.brand === brandItem) resByFilter.push(laptopItem);
+      });
+    });
+
+    const res: Laptop[] = [];
+    resByFilter.forEach((laptopItem: Laptop) => {
+      if (
+        laptopItem.productName.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
+        res.push(laptopItem);
+      }
+    });
+
+    return res;
+  }, [allLaptop, checkedList, searchValue]);
+
   useEffect(() => {
     dispatch(getAllLaptopRequest());
-
-    return () => {
-      dispatch(getAllLaptopComplete([]));
-      dispatch(getPaginationLaptopComplete([]));
-    };
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(
-      getPaginationLaptopRequest({
-        page: pageInfo.page.toString(),
-        size: pageInfo.pageSize.toString() as PaginationSize
-      })
-    );
-
-    return () => {
-      dispatch(getPaginationLaptopComplete([]));
-    };
-  }, [dispatch, pageInfo.page, pageInfo.pageSize]);
 
   return (
     <ProductListContainer>
-      <SearchBar />
+      <SearchBar
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        totalValue={productListByFilter.length}
+      />
       <Divider />
       <ProductListContent>
         <BrandChecklist
@@ -80,23 +81,32 @@ const ProductList = () => {
             onChange={(page, pageSize) =>
               handleChangePagination(page, pageSize)
             }
-            total={allLaptop.length}
+            total={productListByFilter.length}
             defaultPageSize={parseInt(PaginationSize.FIFTEEN, 10)}
+            current={pageInfo.page}
           />
           <div className="product-list">
-            {laptopListPaginate.length ? (
-              laptopListPaginate.map((item) => (
-                <ProductCard
-                  key={item._id}
-                  id={item._id}
-                  image={item.productImg[0]}
-                  name={item.productName}
-                  price={item.price}
-                />
-              ))
+            {productListByFilter.length ? (
+              productListByFilter
+                .slice(
+                  (pageInfo.page - 1) * pageInfo.pageSize,
+                  (pageInfo.page - 1) * pageInfo.pageSize + pageInfo.pageSize
+                )
+                .map(
+                  (item) =>
+                    item && (
+                      <ProductCard
+                        key={item._id}
+                        id={item._id}
+                        image={item.productImg[0]}
+                        name={item.productName}
+                        price={item.price}
+                      />
+                    )
+                )
             ) : (
               <div className="spinner">
-                <Spin size="large" />
+                <EmptyUI />
               </div>
             )}
           </div>

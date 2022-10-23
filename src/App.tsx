@@ -15,7 +15,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AppLayout />} key="Layout">
-          {listRouters.map((route: RouterInterface) => (
+          {listRouters().map((route: RouterInterface) => (
             <Route
               path={route.path}
               element={route.component}

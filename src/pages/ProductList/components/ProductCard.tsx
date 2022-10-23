@@ -12,6 +12,8 @@ import { updateCartActionRequest } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { useFavoriteLaptop } from 'hooks/useFavoriteLaptop';
 import { memo, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { routerPaths } from 'router/router.paths';
 import { ProductCardItem } from '../ProductList.styles';
 
 interface ProductCardProps {
@@ -23,6 +25,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ image, name, price, id }: ProductCardProps) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { allLaptop } = useAppSelector((store) => store.laptop);
   const { favoriteItem, user } = useAppSelector((store) => store.auth);
@@ -103,24 +106,40 @@ const ProductCard = ({ image, name, price, id }: ProductCardProps) => {
             )
           }
           content="Thêm ưa thích"
-          onClick={handleClickOnFavorite}
+          onClick={(e) => {
+            e?.stopPropagation();
+            handleClickOnFavorite();
+          }}
         />
         <StackUI
           width={160}
           icon={<ShoppingCartOutlined />}
           content="Thêm giỏ hàng"
-          onClick={handleClickOnCart}
+          onClick={(e) => {
+            e?.stopPropagation();
+            handleClickOnCart();
+          }}
         />
       </>
     );
   }, [id, inFavoriteItem, handleClickOnFavorite, handleClickOnCart]);
 
   return (
-    <ProductCardItem>
+    <ProductCardItem
+      onClick={(e) => {
+        e.stopPropagation();
+        return id && navigate(routerPaths.LAPTOP_DETAIL(id));
+      }}
+    >
       <img src={image} alt={name} />
       <div>{name}</div>
       <div className="product-price">{price}</div>
-      <Popover content={tooltipMoreMemo} placement="left" trigger="click">
+      <Popover
+        content={tooltipMoreMemo}
+        placement="left"
+        trigger="click"
+        overlayStyle={{ zIndex: 9999 }}
+      >
         <MoreOutlined
           style={{
             cursor: 'pointer',
@@ -130,6 +149,7 @@ const ProductCard = ({ image, name, price, id }: ProductCardProps) => {
             top: 20,
             right: 20
           }}
+          onClick={(e) => e.stopPropagation()}
         />
       </Popover>
     </ProductCardItem>
