@@ -18,10 +18,13 @@ import {
 } from 'constants/user.constants';
 import {
   checkEmailExistActionRequest,
+  clearErr,
   createNewAccountActionRequest,
+  getListImgProfileRequest,
   resetAuthState
 } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import _ from 'lodash';
 import {
   Dispatch,
   FC,
@@ -52,6 +55,15 @@ const SignUpForm: FC<SignUpFormProps> = ({ setUserActionModalType }) => {
     (globalState) => globalState.auth
   );
   const [toggleSeePW, setToggleSeePW] = useState<boolean>(false);
+
+  const { listProfileImgs } = useAppSelector((store) => store.auth);
+
+  const mappedImg = useMemo(() => {
+    if (listProfileImgs.length) {
+      return _.sampleSize(listProfileImgs, 7);
+    }
+    return MockData;
+  }, [listProfileImgs]);
 
   const {
     handleSubmit,
@@ -130,8 +142,9 @@ const SignUpForm: FC<SignUpFormProps> = ({ setUserActionModalType }) => {
   }, [emailExist, setError]);
 
   useEffect(() => {
+    dispatch(getListImgProfileRequest());
     return () => {
-      dispatch(resetAuthState());
+      dispatch(clearErr());
     };
   }, [dispatch]);
 
@@ -142,9 +155,9 @@ const SignUpForm: FC<SignUpFormProps> = ({ setUserActionModalType }) => {
         <Logo blockWidth={180} blockHeight={60} />
       </BasicFlex>
       <Avatar.Group style={{ marginTop: 15, marginBottom: 12 }}>
-        {MockData.map((each, index) => (
+        {mappedImg.map((each, index) => (
           <Avatar
-            src={each.link}
+            src={each}
             key={uniqueKey + index}
             style={{ height: 45, width: 45 }}
           />

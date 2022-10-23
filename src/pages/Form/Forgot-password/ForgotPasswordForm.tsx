@@ -7,7 +7,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Avatar } from 'antd';
 import ButtonUI from 'components/Button/ButtonUI';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
-import { Logo } from 'components/Images/Logo';
 import InputUI from 'components/Input/InputUI';
 import { ColorPalette } from 'constants/style.constant';
 import {
@@ -18,10 +17,12 @@ import {
 } from 'constants/user.constants';
 import {
   checkEmailExistActionRequest,
+  clearErr,
   createNewAccountActionRequest,
-  resetAuthState
+  getListImgProfileRequest
 } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import _ from 'lodash';
 import {
   Dispatch,
   FC,
@@ -54,6 +55,14 @@ const ForgotPasswordForm: FC<ForgotPasswordFormProps> = ({
     (globalState) => globalState.auth
   );
   const [toggleSeePW, setToggleSeePW] = useState<boolean>(false);
+  const { listProfileImgs } = useAppSelector((store) => store.auth);
+
+  const mappedImg = useMemo(() => {
+    if (listProfileImgs.length) {
+      return _.sampleSize(listProfileImgs, 7);
+    }
+    return MockData;
+  }, [listProfileImgs]);
 
   const {
     handleSubmit,
@@ -132,8 +141,9 @@ const ForgotPasswordForm: FC<ForgotPasswordFormProps> = ({
   }, [emailExist, setError]);
 
   useEffect(() => {
+    dispatch(getListImgProfileRequest());
     return () => {
-      dispatch(resetAuthState());
+      dispatch(clearErr());
     };
   }, [dispatch]);
 
@@ -143,9 +153,9 @@ const ForgotPasswordForm: FC<ForgotPasswordFormProps> = ({
         <h2>Lấy lại mật khẩu</h2>
       </BasicFlex>
       <Avatar.Group style={{ marginTop: 15, marginBottom: 12 }}>
-        {MockData.map((each, index) => (
+        {mappedImg.map((each, index) => (
           <Avatar
-            src={each.link}
+            src={each}
             key={uniqueKey + index}
             style={{ height: 45, width: 45 }}
           />

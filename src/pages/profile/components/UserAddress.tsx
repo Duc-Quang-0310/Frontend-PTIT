@@ -26,7 +26,9 @@ const { Option } = Select;
 const UserAddress: FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const dispatch = useAppDispatch();
-  const { province, district, ward } = useAppSelector((store) => store.auth);
+  const { province, district, ward, profile } = useAppSelector(
+    (store) => store.auth
+  );
 
   const handleOnchangeStep = useCallback((current: number) => {
     setCurrentStep(current);
@@ -37,7 +39,8 @@ const UserAddress: FC = () => {
     formState: { errors },
     control,
     getValues,
-    handleSubmit
+    handleSubmit,
+    setValue
   } = useForm<FieldValues>({
     mode: 'onChange',
     defaultValues: UpdateAddressValue,
@@ -66,6 +69,17 @@ const UserAddress: FC = () => {
       dispatch(getWardActionRequest({ districtId: districtWatch }));
     }
   }, [dispatch, districtWatch]);
+
+  useEffect(() => {
+    if (profile) {
+      setValue('firstName', profile?.firstName || '');
+      setValue('lastName', profile?.lastName || '');
+      setValue('province', profile?.province || '');
+      setValue('district', profile?.district || '');
+      setValue('ward', profile?.ward || '');
+      setValue('address', profile?.address || '');
+    }
+  }, [profile, setValue]);
 
   return (
     <RightContentWrapper>

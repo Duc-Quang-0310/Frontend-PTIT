@@ -74,6 +74,7 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
         ...style
       }}
       className={className}
+      onClick={(e) => handleOnClick(e as any)}
     >
       {loading ? (
         <LoadingContainer key={`loading-${btnId}`} className={loadingClassName}>
@@ -81,11 +82,7 @@ const ButtonUI = forwardRef<HTMLElement, ButtonProps>((props, ref) => {
           <p>Đang tải</p>
         </LoadingContainer>
       ) : (
-        <div
-          onClick={(e) => handleOnClick(e)}
-          onKeyDown={(e) => onKeyDown?.(e)}
-          key={`button-${btnId}`}
-        >
+        <div onKeyDown={(e) => onKeyDown?.(e)} key={`button-${btnId}`}>
           {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
           <span
             style={{

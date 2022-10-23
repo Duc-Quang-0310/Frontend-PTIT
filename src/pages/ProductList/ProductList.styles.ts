@@ -1,3 +1,4 @@
+import { ColorPalette } from 'constants/style.constant';
 import styled from 'styled-components';
 
 export const ProductListSearchInfo = styled.div`
@@ -58,6 +59,8 @@ export const ProductCardItem = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  border-radius: 10px;
 
   img {
     width: 250px;
@@ -91,6 +94,7 @@ export const BrandListContainer = styled.div`
     font-weight: 600;
     margin-bottom: 6px;
     font-size: 1rem;
+    margin-bottom: 20px;
   }
 
   .ant-checkbox-wrapper {
@@ -114,7 +118,9 @@ export const BrandListContainer = styled.div`
 
 export const ProductListContainer = styled.div`
   margin-top: 1rem;
-
+  background-color: ${ColorPalette.gray_20};
+  min-height: calc(100vh - 86px);
+  padding-top: 25px;
   .search-info {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

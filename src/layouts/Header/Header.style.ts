@@ -107,13 +107,14 @@ export const PageNavigation = styled.div`
   flex-direction: row;
   font-size: 17px;
   font-weight: 600;
-  gap: 20px;
+  gap: 30px;
   span {
     margin-top: 7px;
     cursor: pointer;
     transition: all ease 0.2s;
     color: ${ColorPalette.gray_3_1};
     text-transform: uppercase;
+    user-select: none;
 
     &:hover {
       color: ${ColorPalette.purpleMain};
