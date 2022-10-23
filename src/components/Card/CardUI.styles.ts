@@ -9,6 +9,7 @@ export const CardContainer = styled.div`
   box-shadow: 12px 1px 14px 4px rgba(118, 118, 118, 0.27);
   overflow: hidden;
   width: 100%;
+  cursor: pointer;
 `;
 
 export const Img = styled.img`

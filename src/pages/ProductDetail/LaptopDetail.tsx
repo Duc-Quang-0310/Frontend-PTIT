@@ -1,5 +1,5 @@
-import { HeartOutlined } from '@ant-design/icons';
-import { Tabs } from 'antd';
+import { HeartOutlined, HeartTwoTone } from '@ant-design/icons';
+import { Tabs, notification } from 'antd';
 import ButtonUI from 'components/Button/ButtonUI';
 import CreditCardIcon from 'components/Images/CreditCardIcon';
 import GlobalIcon from 'components/Images/GlobalIcon';
@@ -8,11 +8,13 @@ import ModalUI from 'components/Modal/ModalUI';
 import Rating from 'components/Rating/Rating';
 import { UPDATE } from 'constants/mock.constants';
 import { ColorPalette } from 'constants/style.constant';
+import { updateCartActionRequest } from 'global/common/auth/auth.slice';
 import {
   getLaptopDetailComplete,
   getLaptopDetailRequest
 } from 'global/common/laptop/laptop.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import { useFavoriteLaptop } from 'hooks/useFavoriteLaptop';
 import {
   FC,
   CSSProperties,
@@ -54,6 +56,7 @@ const LaptopDetail: FC = () => {
   const id = useId();
   const params = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
+  const { handleUpdateFavoriteItem, inFavorite } = useFavoriteLaptop(id);
   const { laptopDetail } = useAppSelector((state) => state.laptop);
   const [, startTransition] = useTransition();
   const imgList = useMemo(
@@ -100,6 +103,7 @@ const LaptopDetail: FC = () => {
     ],
     [params.id, id]
   );
+
   const renderModalProductImg = useMemo(() => {
     if (!openModalImg) {
       return null;
@@ -128,6 +132,45 @@ const LaptopDetail: FC = () => {
       dispatch(getLaptopDetailComplete(null));
     };
   }, [dispatch, params.id]);
+
+  const handleAddToCart = useCallback(() => {
+    if (laptopDetail) {
+      dispatch(
+        updateCartActionRequest({
+          actionType: 'add',
+          id: laptopDetail?._id,
+          detail: {
+            id: laptopDetail?._id || '',
+            img:
+              laptopDetail?.productImg?.[0] ||
+              'https://crast.net/img/2022/09/The-14-inch-MacBook-Pro-sinks-its-price-on-Amazon.jpg',
+            name: laptopDetail?.productName || '',
+            price: laptopDetail?.price || UPDATE,
+            quantity: 1
+          }
+        })
+      );
+      notification.success({
+        message: 'Thêm vào giỏ hàng thành công'
+      });
+    }
+  }, [dispatch, laptopDetail]);
+
+  const handleChangeFavorite = useCallback(() => {
+    if (laptopDetail) {
+      handleUpdateFavoriteItem(
+        {
+          date: laptopDetail?.updatedAt || new Date(),
+          id: laptopDetail?._id,
+          img:
+            laptopDetail?.productImg?.[0] ||
+            'https://crast.net/img/2022/09/The-14-inch-MacBook-Pro-sinks-its-price-on-Amazon.jpg',
+          title: laptopDetail?.productName || UPDATE
+        },
+        'change'
+      );
+    }
+  }, [handleUpdateFavoriteItem, laptopDetail]);
 
   return (
     <LaptopDetailContainer>
@@ -183,11 +226,19 @@ const LaptopDetail: FC = () => {
             colorFill={ColorPalette.purpleMain}
             content="Thêm vào giỏ hàng"
             style={btnStyle}
+            onClick={handleAddToCart}
           />
           <ButtonUI
-            content={<HeartOutlined />}
+            content={
+              !inFavorite ? (
+                <HeartOutlined />
+              ) : (
+                <HeartTwoTone twoToneColor={ColorPalette.purpleMain} />
+              )
+            }
             type="default"
             style={btnStyle}
+            onClick={handleChangeFavorite}
           />
         </FlexBasic>
         <ListGuarantee>

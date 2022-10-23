@@ -31,6 +31,7 @@ interface CardUIProps extends HTMLAttributes<HTMLDivElement> {
   status?: string;
   date?: Date | string;
   loading?: boolean;
+  id?: string;
 }
 
 const CardUI = forwardRef<any, CardUIProps>((props, ref) => {
@@ -42,6 +43,7 @@ const CardUI = forwardRef<any, CardUIProps>((props, ref) => {
     date,
     onClick,
     loading = false,
+    id = '',
     ...other
   } = props;
   const uniqueKey = useId();

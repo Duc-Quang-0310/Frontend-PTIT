@@ -37,11 +37,7 @@ import { InfoTitle } from 'pages/profile/style/UserProfile.styles';
 import InputUI from 'components/Input/InputUI';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { UserActionModalType } from 'constants/user.constants';
-import {
-  setCart,
-  updateCartActionRequest
-} from 'global/common/auth/auth.slice';
-import { CART } from 'constants/mock.constants';
+import { updateCartActionRequest } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import {
   CartItem,
@@ -373,10 +369,6 @@ const Header: FC = () => {
   const handleRedirectHome = useCallback(() => {
     navigate('/');
   }, [navigate]);
-
-  useEffect(() => {
-    dispatch(setCart({ data: CART }));
-  }, [dispatch]);
 
   return (
     <>

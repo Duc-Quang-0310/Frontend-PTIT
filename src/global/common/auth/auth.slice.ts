@@ -3,6 +3,7 @@ import {
   CartItem,
   CreateNewAccountBody,
   District,
+  FavoriteItem,
   Profiles,
   Province,
   User,
@@ -22,6 +23,8 @@ export interface AuthState {
   user: User | null;
   profile: Profiles | null;
   listProfileImgs: string[];
+  internalLoading: boolean;
+  favoriteItem: FavoriteItem[];
 }
 
 const initialState: AuthState = {
@@ -36,7 +39,9 @@ const initialState: AuthState = {
   token: '',
   user: null,
   profile: null,
-  listProfileImgs: []
+  listProfileImgs: [],
+  internalLoading: false,
+  favoriteItem: []
 };
 
 export const authSlice = createSlice({
@@ -146,11 +151,6 @@ export const authSlice = createSlice({
     ) => {
       const { id, actionType, detail } = action.payload;
       const oldCart = state.cart;
-
-      if (!oldCart || oldCart.length === 0) {
-        return { ...state };
-      }
-
       let newCart: CartItem = [];
 
       if (actionType === 'add') {
@@ -194,7 +194,6 @@ export const authSlice = createSlice({
       if (actionType === 'delete') {
         newCart = [...oldCart].filter((item) => item.id !== id);
       }
-
       return {
         ...state,
         cart: newCart
@@ -246,6 +245,13 @@ export const authSlice = createSlice({
       ...state,
       listProfileImgs: action.payload,
       loading: false
+    }),
+    updateFavoriteItem: (
+      state: AuthState,
+      action: PayloadAction<FavoriteItem[]>
+    ) => ({
+      ...state,
+      favoriteItem: action.payload
     })
   }
 });
@@ -268,7 +274,8 @@ export const {
   loginToExistedAccountActionComplete,
   clearErr,
   getListImgProfileRequest,
-  getListImgProfileComplete
+  getListImgProfileComplete,
+  updateFavoriteItem
 } = authSlice.actions;
 
 export default authSlice.reducer;
