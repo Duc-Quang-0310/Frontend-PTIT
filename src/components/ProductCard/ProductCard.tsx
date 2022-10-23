@@ -1,12 +1,16 @@
-import { RiseOutlined } from '@ant-design/icons';
+import { HeartTwoTone, RiseOutlined } from '@ant-design/icons';
 import HeartOutlined from '@ant-design/icons/lib/icons/HeartOutlined';
 import MoreOutlined from '@ant-design/icons/lib/icons/MoreOutlined';
 import ShoppingCartOutlined from '@ant-design/icons/lib/icons/ShoppingCartOutlined';
-import { Empty, Popover, Spin, Tooltip } from 'antd';
+import { Empty, notification, Popover, Spin, Tooltip } from 'antd';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import Rating from 'components/Rating/Rating';
 import StackUI from 'components/Stack/StackUI';
+import { UPDATE } from 'constants/mock.constants';
 import { ColorPalette } from 'constants/style.constant';
+import { updateCartActionRequest } from 'global/common/auth/auth.slice';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import { useFavoriteLaptop } from 'hooks/useFavoriteLaptop';
 import {
   HTMLAttributes,
   forwardRef,
@@ -51,14 +55,69 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
   } = props;
   const uniqueId = useId();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { favoriteItem, user } = useAppSelector((store) => store.auth);
+  const { allLaptop } = useAppSelector((store) => store.laptop);
+  const { handleUpdateFavoriteItem } = useFavoriteLaptop();
 
-  const handleClickOnFavorite = useCallback(() => {
-    //
-  }, []);
+  const inFavoriteItem = useMemo(
+    () =>
+      favoriteItem.length && id
+        ? [...favoriteItem].some((laptop) => laptop.id === id)
+        : false,
+    [favoriteItem, id]
+  );
 
   const handleClickOnCart = useCallback(() => {
-    //
-  }, []);
+    if (!user) {
+      return notification.error({
+        message: 'Bạn cần đăng nhập để set dụng chức năng này'
+      });
+    }
+
+    dispatch(
+      updateCartActionRequest({
+        actionType: 'add',
+        id,
+        detail: {
+          id: id || '',
+          img:
+            productLink ||
+            'https://crast.net/img/2022/09/The-14-inch-MacBook-Pro-sinks-its-price-on-Amazon.jpg',
+          name: title || '',
+          price:
+            (allLaptop.length &&
+              allLaptop.find((each) => each._id === id)?.price) ||
+            UPDATE,
+          quantity: 1
+        }
+      })
+    );
+    notification.success({
+      message: 'Thêm vào giỏ hàng thành công',
+      duration: 1
+    });
+  }, [allLaptop, dispatch, id, productLink, title, user]);
+
+  const handleClickOnFavorite = useCallback(() => {
+    const currentLaptop =
+      allLaptop.length && allLaptop.find((each) => each._id === id);
+
+    if (!currentLaptop) {
+      return null;
+    }
+    handleUpdateFavoriteItem(
+      {
+        date: currentLaptop?.updatedAt || new Date(),
+        id: currentLaptop?._id,
+        img:
+          currentLaptop?.productImg?.[0] ||
+          'https://crast.net/img/2022/09/The-14-inch-MacBook-Pro-sinks-its-price-on-Amazon.jpg',
+        title: currentLaptop?.productName || UPDATE
+      },
+      'change'
+    );
+  }, [allLaptop, handleUpdateFavoriteItem, id]);
 
   const handleClickDetail = useCallback(
     () => id && navigate(routerPaths.LAPTOP_DETAIL(id)),
@@ -73,7 +132,13 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
       <>
         <StackUI
           width={160}
-          icon={<HeartOutlined />}
+          icon={
+            inFavoriteItem ? (
+              <HeartTwoTone twoToneColor={ColorPalette.purpleMain} />
+            ) : (
+              <HeartOutlined />
+            )
+          }
           content="Thêm ưa thích"
           onClick={handleClickOnFavorite}
         />
@@ -92,9 +157,10 @@ const ProductCard = forwardRef<any, ProductCardProps>((props, ref) => {
       </>
     );
   }, [
-    handleClickOnCart,
-    handleClickOnFavorite,
     productLink,
+    inFavoriteItem,
+    handleClickOnFavorite,
+    handleClickOnCart,
     handleClickDetail
   ]);
 

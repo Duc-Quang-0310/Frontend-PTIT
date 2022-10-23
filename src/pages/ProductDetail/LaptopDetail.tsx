@@ -56,8 +56,9 @@ const LaptopDetail: FC = () => {
   const id = useId();
   const params = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
-  const { handleUpdateFavoriteItem, inFavorite } = useFavoriteLaptop(id);
+  const { handleUpdateFavoriteItem } = useFavoriteLaptop();
   const { laptopDetail } = useAppSelector((state) => state.laptop);
+  const { favoriteItem, user } = useAppSelector((state) => state.auth);
   const [, startTransition] = useTransition();
   const imgList = useMemo(
     () =>
@@ -69,6 +70,14 @@ const LaptopDetail: FC = () => {
   const [imgIndex, setImgIndex] = useState(0);
   const [openModalImg, setOpenModalImg] = useState(false);
   const HASH = 160;
+
+  const inFavoriteItem = useMemo(
+    () =>
+      favoriteItem.length && params?.id
+        ? [...favoriteItem].some((laptop) => laptop.id === params.id)
+        : false,
+    [favoriteItem, params.id]
+  );
 
   const handleClickOnImg = useCallback(
     (index: number) => {
@@ -134,6 +143,12 @@ const LaptopDetail: FC = () => {
   }, [dispatch, params.id]);
 
   const handleAddToCart = useCallback(() => {
+    if (!user) {
+      return notification.error({
+        message: 'Bạn cần đăng nhập để set dụng chức năng này'
+      });
+    }
+
     if (laptopDetail) {
       dispatch(
         updateCartActionRequest({
@@ -154,7 +169,7 @@ const LaptopDetail: FC = () => {
         message: 'Thêm vào giỏ hàng thành công'
       });
     }
-  }, [dispatch, laptopDetail]);
+  }, [dispatch, laptopDetail, user]);
 
   const handleChangeFavorite = useCallback(() => {
     if (laptopDetail) {
@@ -230,7 +245,7 @@ const LaptopDetail: FC = () => {
           />
           <ButtonUI
             content={
-              !inFavorite ? (
+              !inFavoriteItem ? (
                 <HeartOutlined />
               ) : (
                 <HeartTwoTone twoToneColor={ColorPalette.purpleMain} />

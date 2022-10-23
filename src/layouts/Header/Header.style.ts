@@ -33,6 +33,13 @@ export const IconWrapper = styled.div`
   height: 42px;
   transition: all ease-in 0.2s;
   cursor: pointer;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 export const CartItem = styled.div`

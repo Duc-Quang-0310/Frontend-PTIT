@@ -2,8 +2,6 @@ import { Col, Row } from 'antd';
 import ProductCard from 'components/ProductCard/ProductCard';
 import { useLaptop } from 'hooks/useLaptop';
 import { FC, memo, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { routerPaths } from 'router/router.paths';
 import { BestSellerContainer } from '../style/BestSeller';
 
 const MOCK_DATA = [
