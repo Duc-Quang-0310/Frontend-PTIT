@@ -101,3 +101,27 @@ export const ScrollableCart = styled.div`
     background: ${ColorPalette.purpleMain};
   }
 `;
+
+export const PageNavigation = styled.div`
+  display: flex;
+  flex-direction: row;
+  font-size: 17px;
+  font-weight: 600;
+  gap: 20px;
+  span {
+    margin-top: 7px;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    color: ${ColorPalette.gray_3_1};
+    text-transform: uppercase;
+
+    &:hover {
+      color: ${ColorPalette.purpleMain};
+    }
+  }
+
+  .active {
+    border-bottom: 4px solid ${ColorPalette.purle_classic};
+    color: ${ColorPalette.purle_classic};
+  }
+`;

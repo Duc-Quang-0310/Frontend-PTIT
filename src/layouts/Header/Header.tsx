@@ -5,10 +5,10 @@ import {
   ShoppingCartOutlined,
   PlusCircleTwoTone,
   MinusCircleTwoTone,
-  LogoutOutlined
+  LogoutOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { Popover, Result } from 'antd';
-import { BellIcon } from 'components/Images/BellIcon';
 import { CartIcon } from 'components/Images/CartIcon';
 import { Logo } from 'components/Images/Logo';
 import UserIcon from 'components/Images/UserIcon';
@@ -26,7 +26,7 @@ import {
   useMemo,
   useState
 } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -37,14 +37,19 @@ import { InfoTitle } from 'pages/profile/style/UserProfile.styles';
 import InputUI from 'components/Input/InputUI';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { UserActionModalType } from 'constants/user.constants';
-import { updateCartActionRequest } from 'global/common/auth/auth.slice';
+import {
+  resetAuthState,
+  updateCartActionRequest
+} from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import { routerPaths } from 'router/router.paths';
 import {
   CartItem,
   CursorPointer,
   HeaderContainer,
   IconWrapper,
   ListIconWrapper,
+  PageNavigation,
   ScrollableCart
 } from './Header.style';
 import './Header.style.css';
@@ -58,6 +63,8 @@ const Header: FC = () => {
     useState<UserActionModalType>(UserActionModalType.NONE);
   const [paymentStep, setPaymentStep] = useState(1);
   const navigate = useNavigate();
+
+  const { pathname } = useLocation();
 
   const {
     formState: { errors },
@@ -322,14 +329,24 @@ const Header: FC = () => {
           />
         </>
       ) : (
-        <StackUI
-          width={140}
-          icon={<LogoutOutlined />}
-          content="Đăng xuất"
-          onClick={() => {}}
-        />
+        <>
+          <StackUI
+            width={140}
+            icon={<LogoutOutlined />}
+            content="Đăng xuất"
+            onClick={() => {
+              dispatch(resetAuthState());
+            }}
+          />
+          <StackUI
+            width={140}
+            icon={<UserOutlined />}
+            content="Thông tin người dùng"
+            onClick={() => navigate(routerPaths.USER_PROFILE(profile._id))}
+          />
+        </>
       ),
-    [profile]
+    [dispatch, navigate, profile]
   );
 
   const renderFormModal = useMemo(() => {
@@ -387,24 +404,39 @@ const Header: FC = () => {
         <CursorPointer onClick={handleRedirectHome}>
           <Logo blockWidth={150} blockHeight="100%" />
         </CursorPointer>
-        <ListIconWrapper>
-          {/* <Popover
-            trigger="click"
-            destroyTooltipOnHide
-            key={`${uniqueKey}bell-icon`}
+        <PageNavigation>
+          <span
+            className={pathname === '/' ? 'active' : ''}
+            onClick={() => navigate(routerPaths.HOME)}
           >
-            <IconWrapper className="icon-wrapper">
-              <BellIcon blockHeight="100%" blockWidth={20} />
-            </IconWrapper>
-          </Popover> */}
+            Trang chủ
+          </span>
+          <span
+            className={pathname === '/laptop' ? 'active' : ''}
+            onClick={() => navigate(routerPaths.PRODUCT_LIST)}
+          >
+            Sản phẩm
+          </span>
 
-          <IconWrapper
-            className="icon-wrapper"
-            key={`${uniqueKey}cart-icon`}
-            onClick={handleClickCart}
-          >
-            <CartIcon blockHeight="100%" blockWidth={20} />
-          </IconWrapper>
+          {profile && (
+            <span
+              className={pathname.includes('user') ? 'active' : ''}
+              onClick={() => navigate(routerPaths.USER_PROFILE(profile._id))}
+            >
+              Cá nhân
+            </span>
+          )}
+        </PageNavigation>
+        <ListIconWrapper>
+          {profile && (
+            <IconWrapper
+              className="icon-wrapper"
+              key={`${uniqueKey}cart-icon`}
+              onClick={handleClickCart}
+            >
+              <CartIcon blockHeight="100%" blockWidth={20} />
+            </IconWrapper>
+          )}
 
           <Popover
             trigger="click"
