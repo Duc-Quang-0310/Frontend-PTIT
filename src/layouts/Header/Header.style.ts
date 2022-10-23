@@ -107,7 +107,7 @@ export const PageNavigation = styled.div`
   flex-direction: row;
   font-size: 17px;
   font-weight: 600;
-  gap: 20px;
+  gap: 30px;
   span {
     margin-top: 7px;
     cursor: pointer;

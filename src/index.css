@@ -73,3 +73,14 @@
 .btnCombination span {
   user-select: none;
 }
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #7F56D9 !important;
+  border-color: #7F56D9 !important;
+}
+
+
+.ant-checkbox-checked .ant-checkbox-inner:hover {
+  background-color: #7F56D9 !important;
+  border-color: #7F56D9 !important;
+}

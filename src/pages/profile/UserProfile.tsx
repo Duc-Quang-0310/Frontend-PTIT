@@ -1,9 +1,11 @@
 import { CameraOutlined } from '@ant-design/icons';
+import { UPDATE } from 'constants/mock.constants';
 import { ColorPalette } from 'constants/style.constant';
 import { Tab } from 'constants/user.constants';
+import { useAppSelector } from 'hooks/redux';
 import moment from 'moment';
 import { LaptopDetailContainer } from 'pages/ProductDetail/style/LaptopDetail';
-import { FC, useId, useMemo, useState } from 'react';
+import { FC, useId, useMemo, useRef, useState } from 'react';
 import Favorite from './components/Favorite';
 import PasswordChange from './components/PasswordChange';
 import ReceiptHistory from './components/ReceiptHistory';
@@ -13,27 +15,32 @@ import { Left, Right } from './style/UserProfile.styles';
 const UserProfile: FC = () => {
   const uniqueKey = useId();
   const [tab, setTab] = useState<Tab>(Tab.ADDRESS);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { profile, user } = useAppSelector((store) => store.auth);
 
   const INFO = useMemo(
-    () => [
-      {
-        label: 'Trạng thái:',
-        value: 'Hoạt động'
-      },
-      {
-        label: 'Hoạt động:',
-        value: moment().format('Do MMMM YYYY')
-      },
-      {
-        label: 'Tham gia:',
-        value: moment().format('Do MMMM YYYY')
-      },
-      {
-        label: 'Email:',
-        value: 'ducquang03102000@gmail.com'
-      }
-    ],
-    []
+    () =>
+      profile
+        ? [
+            {
+              label: 'Trạng thái:',
+              value: 'Hoạt động'
+            },
+            {
+              label: 'Hoạt động:',
+              value: moment(profile?.updatedAt).format('Do MMMM YYYY') || UPDATE
+            },
+            {
+              label: 'Tham gia:',
+              value: moment(user?.createdAt).format('Do MMMM YYYY') || UPDATE
+            },
+            {
+              label: 'Email:',
+              value: user?.email || UPDATE
+            }
+          ]
+        : [],
+    [profile, user?.createdAt, user?.email]
   );
 
   const renderTabMemo = useMemo(() => {
@@ -57,21 +64,32 @@ const UserProfile: FC = () => {
       <Left key={`${uniqueKey} - left`}>
         <div className="avatar">
           <img
-            src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+            src={
+              profile && profile?.avatar
+                ? profile?.avatar
+                : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500'
+            }
             alt="user-avatar"
           />
-          <div className="uploadImg">
+          <div className="uploadImg" onClick={() => fileRef?.current?.click()}>
             <CameraOutlined
               style={{
                 fontSize: 22,
                 color: ColorPalette.white
               }}
             />
+            <input
+              type="file"
+              id="user-avatar"
+              accept="image/*"
+              style={{ display: 'none' }}
+              ref={fileRef}
+            />
           </div>
         </div>
 
         <div className="info">
-          <h3>Nguyễn Đức Quang</h3>
+          <h3>{`${profile?.firstName} ${profile?.lastName}` || UPDATE}</h3>
           {INFO?.map((each) => (
             <div className="block" key={`${uniqueKey} - ${each.label}`}>
               <div className="label">{each.label}</div>

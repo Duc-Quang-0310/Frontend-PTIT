@@ -1,10 +1,7 @@
 import { Divider, Pagination } from 'antd';
 import { Laptop, PaginationSize } from 'services/client.interface';
 import EmptyUI from 'components/Empty/EmptyUI';
-import {
-  getAllLaptopComplete,
-  getAllLaptopRequest
-} from 'global/common/laptop/laptop.slice';
+import { getAllLaptopRequest } from 'global/common/laptop/laptop.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { useEffect, useMemo, useState } from 'react';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
