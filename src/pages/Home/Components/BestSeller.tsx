@@ -43,7 +43,7 @@ const BestSeller: FC = () => {
   const convertedData = useMemo(() => {
     if (randomProduct) {
       return randomProduct.map((laptop) => ({
-        price: '16.999.000',
+        price: laptop?.price?.split(' ')[0],
         productLink:
           laptop?.productImg?.[0] ||
           'https://crast.net/img/2022/09/The-14-inch-MacBook-Pro-sinks-its-price-on-Amazon.jpg',

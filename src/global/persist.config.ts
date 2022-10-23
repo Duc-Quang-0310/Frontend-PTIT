@@ -19,7 +19,8 @@ const authPersistConfig: PersistConfig<any, unknown, unknown, unknown> = {
     'cart',
     'token',
     'user',
-    'profile'
+    'profile',
+    'favoriteItem'
   ]
 };
 

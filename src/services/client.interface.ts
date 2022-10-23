@@ -184,6 +184,13 @@ export interface GetListLaptopPaginateBody {
   size: PaginationSize;
 }
 
+export interface FavoriteItem {
+  img: string;
+  title: string;
+  date: string | Date;
+  id: string;
+}
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 
