@@ -4,7 +4,8 @@ import {
   LoginOutlined,
   ShoppingCartOutlined,
   PlusCircleTwoTone,
-  MinusCircleTwoTone
+  MinusCircleTwoTone,
+  LogoutOutlined
 } from '@ant-design/icons';
 import { Popover, Result } from 'antd';
 import { BellIcon } from 'components/Images/BellIcon';
@@ -21,7 +22,6 @@ import {
   memo,
   ReactNode,
   useCallback,
-  useEffect,
   useId,
   useMemo,
   useState
@@ -52,7 +52,7 @@ import './Header.style.css';
 const Header: FC = () => {
   const uniqueKey = useId();
   const dispatch = useAppDispatch();
-  const { cart } = useAppSelector((store) => store.auth);
+  const { cart, profile } = useAppSelector((store) => store.auth);
   const [modal, setModal] = useState(false);
   const [userActionModalType, setUserActionModalType] =
     useState<UserActionModalType>(UserActionModalType.NONE);
@@ -303,25 +303,33 @@ const Header: FC = () => {
   ]);
 
   const renderPopupAccount = useMemo(
-    () => (
-      <>
+    () =>
+      !profile ? (
+        <>
+          <StackUI
+            width={140}
+            icon={<LoginOutlined />}
+            content="Đăng nhập"
+            onClick={() => setUserActionModalType(UserActionModalType.LOG_IN)}
+          />
+          <StackUI
+            width={140}
+            icon={<ImportOutlined />}
+            content="Đăng ký"
+            onClick={() =>
+              setUserActionModalType(UserActionModalType.NEW_ACCOUNT)
+            }
+          />
+        </>
+      ) : (
         <StackUI
           width={140}
-          icon={<LoginOutlined />}
-          content="Đăng nhập"
-          onClick={() => setUserActionModalType(UserActionModalType.LOG_IN)}
+          icon={<LogoutOutlined />}
+          content="Đăng xuất"
+          onClick={() => {}}
         />
-        <StackUI
-          width={140}
-          icon={<ImportOutlined />}
-          content="Đăng ký"
-          onClick={() =>
-            setUserActionModalType(UserActionModalType.NEW_ACCOUNT)
-          }
-        />
-      </>
-    ),
-    []
+      ),
+    [profile]
   );
 
   const renderFormModal = useMemo(() => {
@@ -380,7 +388,7 @@ const Header: FC = () => {
           <Logo blockWidth={150} blockHeight="100%" />
         </CursorPointer>
         <ListIconWrapper>
-          <Popover
+          {/* <Popover
             trigger="click"
             destroyTooltipOnHide
             key={`${uniqueKey}bell-icon`}
@@ -388,7 +396,7 @@ const Header: FC = () => {
             <IconWrapper className="icon-wrapper">
               <BellIcon blockHeight="100%" blockWidth={20} />
             </IconWrapper>
-          </Popover>
+          </Popover> */}
 
           <IconWrapper
             className="icon-wrapper"
@@ -406,7 +414,11 @@ const Header: FC = () => {
             className="padding-0"
           >
             <IconWrapper className="icon-wrapper">
-              <UserIcon blockHeight="100%" blockWidth={22} />
+              {profile && profile?.avatar ? (
+                <img src={profile?.avatar} alt={profile?.avatar} />
+              ) : (
+                <UserIcon blockHeight="100%" blockWidth={22} />
+              )}
             </IconWrapper>
           </Popover>
         </ListIconWrapper>
