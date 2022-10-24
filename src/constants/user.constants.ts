@@ -138,3 +138,31 @@ export const PaymentInfoSchema = Yup.object().shape({
   name: Yup.string().required('Tên người nhận là bắt buộc'),
   address: Yup.string().required('Địa chỉ là bắt buộc')
 });
+
+export const PasswordRecoverSchema = Yup.object().shape({
+  email: Yup.string()
+    .trim()
+    .email('Chưa phải dạng email')
+    .min(10, 'Email quá ngắn')
+    .max(64, 'Email quá dài')
+    .required('Email không được để trống'),
+  password: Yup.string()
+    .min(8, 'Mật khẩu không được ngắn hơn 8 ký tự')
+    .max(30, 'Mật khẩu không được dài hơn 30 ký tự')
+    .required('Mật khẩu không được để trống')
+    .matches(
+      REGEX_PASSWORD,
+      'Tối thiểu 8 ký tự, Một chữ hoa, Một chữ thường, Một chữ số, và Một ký tự đặc biệt'
+    ),
+  confirmPassword: Yup.string()
+    .min(8, 'Mật khẩu không được ngắn hơn 8 ký tự')
+    .max(30, 'Mật khẩu không được dài hơn 30 ký tự')
+    .required('Mật khẩu không được để trống')
+    .oneOf([Yup.ref('password')], 'Mật khẩu nhập lại không đúng ')
+});
+
+export const PasswordRecoverDefaultValue = {
+  email: '',
+  password: '',
+  confirmPassword: ''
+};

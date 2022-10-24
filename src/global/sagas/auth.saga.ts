@@ -14,7 +14,12 @@ import {
   loginToExistedAccountActionComplete,
   loginToExistedAccountActionRequest,
   getListImgProfileComplete,
-  getListImgProfileRequest
+  getListImgProfileRequest,
+  clearErr,
+  passwordRecoverActionComplete,
+  passwordRecoverActionRequest,
+  changePasswordActionComplete,
+  changePasswordActionRequest
 } from 'global/common/auth/auth.slice';
 import { setLocalStorageItem } from 'helpers/storage';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
@@ -29,12 +34,14 @@ import {
   WardData
 } from 'services/client.interface';
 import {
+  changePassword,
   createNewAccount,
   getAllProfile,
   getDistrict,
   getProvince,
   getWard,
   loginToExistedAccount,
+  recoverPassword,
   validateEmailExist
 } from 'services/client.services';
 
@@ -142,7 +149,7 @@ function* loginExistedAccountActionSaga(
   action: PayloadAction<CreateNewAccountBody>
 ) {
   try {
-    yield put(resetAuthState());
+    yield put(clearErr());
     const { onComplete, ...other } = action.payload;
     const data: LoginToExistedAccountData = yield call(() =>
       loginToExistedAccount(other)
@@ -188,6 +195,65 @@ function* getListProfileSaga() {
   }
 }
 
+function* passwordRecoverSaga(
+  action: PayloadAction<{
+    email: string;
+    password: string;
+    onSuccess?: Function;
+  }>
+) {
+  try {
+    const { onSuccess, ...other } = action.payload;
+    yield put(clearErr());
+    const res: string = yield call(() => recoverPassword(other));
+
+    yield put(
+      passwordRecoverActionComplete({
+        success: true,
+        message: res
+      })
+    );
+    onSuccess?.();
+  } catch (error: any) {
+    yield put(
+      passwordRecoverActionComplete({
+        success: false,
+        message: error.response.data.message
+      })
+    );
+  }
+}
+
+function* changePasswordSaga(
+  action: PayloadAction<{
+    oldPassword: string;
+    newPassword: string;
+    userId: string;
+    onSuccess?: Function;
+  }>
+) {
+  try {
+    const { onSuccess, ...other } = action.payload;
+    yield put(clearErr());
+    const res: string = yield call(() => changePassword(other));
+
+    yield put(
+      changePasswordActionComplete({
+        success: true,
+        message: res
+      })
+    );
+    onSuccess?.();
+  } catch (error: any) {
+    yield put(
+      changePasswordActionComplete({
+        success: false,
+        message: error.response.data.message
+      })
+    );
+  }
+}
+
 export default function* authSaga() {
   yield all([
     takeLatest(createNewAccountActionRequest.type, createNewAccountActionSaga),
@@ -199,6 +265,8 @@ export default function* authSaga() {
       loginToExistedAccountActionRequest.type,
       loginExistedAccountActionSaga
     ),
-    takeLatest(getListImgProfileRequest.type, getListProfileSaga)
+    takeLatest(getListImgProfileRequest.type, getListProfileSaga),
+    takeLatest(passwordRecoverActionRequest.type, passwordRecoverSaga),
+    takeLatest(changePasswordActionRequest.type, changePasswordSaga)
   ]);
 }
