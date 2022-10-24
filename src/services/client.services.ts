@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import request from './axios.connection';
 import {
   CheckEmailExistDataResponse,
@@ -102,4 +102,27 @@ export const getListLaptopPaginate = async ({
 export const getDetailLaptop = async (id: string): Promise<Laptop> => {
   const response: LaptopDetailResponse = await request.get(`/api/laptop/${id}`);
   return response.data.laptop;
+};
+
+export const recoverPassword = async (params: {
+  email: string;
+  password: string;
+}): Promise<string> => {
+  const response: AxiosResponse<{ message: string }> = await request.post(
+    `/api/user/password-recover`,
+    params
+  );
+  return response.data.message;
+};
+
+export const changePassword = async (params: {
+  oldPassword: string;
+  newPassword: string;
+  userId: string;
+}): Promise<string> => {
+  const response: AxiosResponse<{ message: string }> = await request.post(
+    `/api/user/change-password`,
+    params
+  );
+  return response.data.message;
 };

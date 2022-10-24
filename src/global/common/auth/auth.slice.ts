@@ -254,6 +254,52 @@ export const authSlice = createSlice({
     ) => ({
       ...state,
       favoriteItem: action.payload
+    }),
+    passwordRecoverActionRequest: (
+      state: AuthState,
+      action: PayloadAction<{
+        email: string;
+        password: string;
+        onSuccess?: Function;
+      }>
+    ) => ({
+      ...state,
+      internalLoading: true
+    }),
+    passwordRecoverActionComplete: (
+      state: AuthState,
+      action: PayloadAction<{
+        success: boolean;
+        message: string;
+      }>
+    ) => ({
+      ...state,
+      success: action.payload.success,
+      message: action.payload.message
+    }),
+    changePasswordActionRequest: (
+      state: AuthState,
+      action: PayloadAction<{
+        oldPassword: string;
+        newPassword: string;
+        userId: string;
+        onSuccess?: Function;
+      }>
+    ) => ({
+      ...state,
+      internalLoading: true
+    }),
+    changePasswordActionComplete: (
+      state: AuthState,
+      action: PayloadAction<{
+        success: boolean;
+        message: string;
+      }>
+    ) => ({
+      ...state,
+      success: action.payload.success,
+      message: action.payload.message,
+      internalLoading: false
     })
   }
 });
@@ -277,7 +323,11 @@ export const {
   clearErr,
   getListImgProfileRequest,
   getListImgProfileComplete,
-  updateFavoriteItem
+  updateFavoriteItem,
+  passwordRecoverActionRequest,
+  passwordRecoverActionComplete,
+  changePasswordActionRequest,
+  changePasswordActionComplete
 } = authSlice.actions;
 
 export default authSlice.reducer;

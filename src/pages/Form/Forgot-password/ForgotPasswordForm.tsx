@@ -11,15 +11,16 @@ import InputUI from 'components/Input/InputUI';
 import { ColorPalette } from 'constants/style.constant';
 import {
   MockData,
-  SignUpFormDefaultValue,
-  SignUpFormValidation,
+  PasswordRecoverDefaultValue,
+  PasswordRecoverSchema,
   UserActionModalType
 } from 'constants/user.constants';
 import {
   checkEmailExistActionRequest,
   clearErr,
   createNewAccountActionRequest,
-  getListImgProfileRequest
+  getListImgProfileRequest,
+  passwordRecoverActionRequest
 } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import _ from 'lodash';
@@ -51,7 +52,7 @@ const ForgotPasswordForm: FC<ForgotPasswordFormProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const uniqueKey = useId();
-  const { message, success, loading, emailExist } = useAppSelector(
+  const { message, success, internalLoading, emailExist } = useAppSelector(
     (globalState) => globalState.auth
   );
   const [toggleSeePW, setToggleSeePW] = useState<boolean>(false);
@@ -75,8 +76,8 @@ const ForgotPasswordForm: FC<ForgotPasswordFormProps> = ({
     reset
   } = useForm<FieldValues>({
     mode: 'onChange',
-    defaultValues: SignUpFormDefaultValue,
-    resolver: yupResolver(SignUpFormValidation)
+    defaultValues: PasswordRecoverDefaultValue,
+    resolver: yupResolver(PasswordRecoverSchema)
   });
 
   const emailWatch = watch('email');
@@ -91,17 +92,15 @@ const ForgotPasswordForm: FC<ForgotPasswordFormProps> = ({
     [toggleSeePW]
   );
 
-  const onSubmitLogin = useCallback(
+  const onSubmitRecoverPW = useCallback(
     (value: any) => {
       clearErrors();
-      const { email, password, firstName, lastName } = value;
+      const { email, password } = value;
       dispatch(
-        createNewAccountActionRequest({
+        passwordRecoverActionRequest({
           email,
           password,
-          firstName: !firstName ? undefined : firstName,
-          lastName: !lastName ? undefined : lastName,
-          onComplete: () => reset()
+          onSuccess: () => reset()
         })
       );
     },
@@ -239,8 +238,8 @@ const ForgotPasswordForm: FC<ForgotPasswordFormProps> = ({
               fontSize: 16,
               letterSpacing: '0.8px'
             }}
-            onClick={handleSubmit(onSubmitLogin)}
-            loading={loading}
+            onClick={handleSubmit(onSubmitRecoverPW)}
+            loading={internalLoading}
           />
         </BasicFlex>
 
