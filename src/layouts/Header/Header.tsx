@@ -192,14 +192,20 @@ const Header: FC = () => {
             control={control}
             render={({ field: { value, onChange, ref } }) => {
               return (
-                <InputUI
-                  ref={ref}
-                  value={value}
-                  errors={errors}
-                  name="name"
-                  onChange={onChange}
-                  marginNone="marginNone"
-                />
+                <>
+                  <InputUI
+                    ref={ref}
+                    value={value}
+                    name="name"
+                    onChange={onChange}
+                    marginNone="marginNone"
+                  />
+                  {errors && errors?.name && (
+                    <div className="error-text">
+                      {String(errors?.name?.message)}
+                    </div>
+                  )}
+                </>
               );
             }}
           />
@@ -210,14 +216,20 @@ const Header: FC = () => {
             control={control}
             render={({ field: { value, onChange, ref } }) => {
               return (
-                <InputUI
-                  ref={ref}
-                  value={value}
-                  errors={errors}
-                  name="address"
-                  onChange={onChange}
-                  marginNone="marginNone"
-                />
+                <>
+                  <InputUI
+                    ref={ref}
+                    value={value}
+                    name="address"
+                    onChange={onChange}
+                    marginNone="marginNone"
+                  />
+                  {errors && errors?.address && (
+                    <div className="error-text">
+                      {String(errors?.address?.message)}
+                    </div>
+                  )}
+                </>
               );
             }}
           />
@@ -228,14 +240,20 @@ const Header: FC = () => {
             control={control}
             render={({ field: { value, onChange, ref } }) => {
               return (
-                <InputUI
-                  ref={ref}
-                  value={value}
-                  errors={errors}
-                  name="telephone"
-                  onChange={onChange}
-                  marginNone="marginNone"
-                />
+                <>
+                  <InputUI
+                    ref={ref}
+                    value={value}
+                    name="telephone"
+                    onChange={onChange}
+                    marginNone="marginNone"
+                  />
+                  {errors && errors?.telephone && (
+                    <div className="error-text">
+                      {String(errors?.telephone?.message)}
+                    </div>
+                  )}
+                </>
               );
             }}
           />
@@ -448,7 +466,7 @@ const Header: FC = () => {
     navigate('/');
   }, [navigate]);
 
-  useEffect(() => {
+  const handleSetDataForUserOnCart = useCallback(() => {
     if (profile) {
       setValue('name', `${profile?.firstName} ${profile?.lastName}` || '');
       if (
@@ -477,6 +495,16 @@ const Header: FC = () => {
       }
     }
   }, [district, profile, province, setValue, ward]);
+
+  useEffect(() => {
+    if (paymentStep && paymentStep === 2) {
+      handleSetDataForUserOnCart();
+    }
+  }, [handleSetDataForUserOnCart, paymentStep]);
+
+  useEffect(() => {
+    handleSetDataForUserOnCart();
+  }, [handleSetDataForUserOnCart]);
 
   useEffect(() => {
     dispatch(getProvinceActionRequest());
