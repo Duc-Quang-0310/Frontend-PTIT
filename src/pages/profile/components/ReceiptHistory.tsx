@@ -2,8 +2,11 @@ import CollapseUI from 'components/CollapseUI/CollapseUI';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import EmptyUI from 'components/Empty/EmptyUI';
 import { ColorPalette } from 'constants/style.constant';
+import { getAllReceiptsRequest } from 'global/common/auth/auth.slice';
+import { useAppSelector } from 'hooks/redux';
 import moment from 'moment';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   BillInfo,
   RightContentWrapper,
@@ -12,10 +15,14 @@ import {
 } from '../style/UserProfile.styles';
 
 const ReceiptHistory = () => {
+  const { user, receipts, profile } = useAppSelector((store) => store.auth);
+  const dispatch = useDispatch();
+
   const renderInside = useCallback(
     (
       username: string,
       date: Date | string,
+      address: string,
       item: {
         img: string;
         price: string;
@@ -31,6 +38,10 @@ const ReceiptHistory = () => {
         <BillInfo style={{ marginBottom: 10 }}>
           <div className="title">Ngày lên đơn:</div>
           <span> {moment(date).format('Do MMMM YYYY')}</span>
+        </BillInfo>
+        <BillInfo style={{ marginBottom: 10 }}>
+          <div className="title">Địa chỉ:</div>
+          <span> {address}</span>
         </BillInfo>
         <Scrollable>
           {item?.map((each, index) => (
@@ -82,45 +93,37 @@ const ReceiptHistory = () => {
     []
   );
 
-  const valueMemo = useMemo(() => [1], []);
+  useEffect(() => {
+    if (user) {
+      dispatch(getAllReceiptsRequest(user._id));
+    }
+  }, [dispatch, user]);
 
   return (
     <RightContentWrapper>
       <h3>Đơn hàng của bạn</h3>
       <div className="subtitle">Đơn hàng</div>
-      {valueMemo.length === 0 ? (
+      {receipts.length === 0 ? (
         <EmptyUI />
       ) : (
-        valueMemo.map((each) => (
+        receipts.map((each) => (
           <CollapseUI
-            key={each}
-            contentCollapse={renderInside('Duc Quang', new Date(), [
-              {
-                img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-                price: '19.990.000',
-                quantity: 2,
-                name: 'May tinh'
-              },
-              {
-                img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-                price: '19.990.000',
-                quantity: 2,
-                name: 'May tinh'
-              },
-              {
-                img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-                price: '19.990.000',
-                quantity: 2,
-                name: 'May tinh'
-              },
-              {
-                img: 'https://i.natgeofe.com/n/c9107b46-78b1-4394-988d-53927646c72b/1095.jpg',
-                price: '19.990.000',
-                quantity: 2,
-                name: 'May tinh'
-              }
-            ])}
-            title="ID: 123"
+            key={each._id}
+            contentCollapse={renderInside(
+              `${profile?.firstName} ${profile?.lastName}`,
+              each.lastModify,
+              each.address,
+              each.items.map((item, index) => ({
+                img: item?.productImg?.[0],
+                name: item?.productName,
+                price: item?.price,
+                quantity:
+                  each?.quantity && each?.quantity?.length
+                    ? each?.quantity?.[index]
+                    : 1
+              }))
+            )}
+            title={`ID: ${each._id}`}
           />
         ))
       )}

@@ -8,7 +8,7 @@ import {
   LogoutOutlined,
   UserOutlined
 } from '@ant-design/icons';
-import { Popover, Result } from 'antd';
+import { notification, Popover, Result } from 'antd';
 import { CartIcon } from 'components/Images/CartIcon';
 import { Logo } from 'components/Images/Logo';
 import UserIcon from 'components/Images/UserIcon';
@@ -22,6 +22,7 @@ import {
   memo,
   ReactNode,
   useCallback,
+  useEffect,
   useId,
   useMemo,
   useState
@@ -37,8 +38,14 @@ import { InfoTitle } from 'pages/profile/style/UserProfile.styles';
 import InputUI from 'components/Input/InputUI';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { UserActionModalType } from 'constants/user.constants';
+import { phoneRegExp } from 'constants/mock.constants';
+import { paymentBill } from 'services/client.services';
 import {
+  getDistrictActionRequest,
+  getProvinceActionRequest,
+  getWardActionRequest,
   resetAuthState,
+  setCart,
   updateCartActionRequest
 } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
@@ -57,7 +64,9 @@ import './Header.style.css';
 const Header: FC = () => {
   const uniqueKey = useId();
   const dispatch = useAppDispatch();
-  const { cart, profile } = useAppSelector((store) => store.auth);
+  const { cart, profile, province, district, ward, user } = useAppSelector(
+    (store) => store.auth
+  );
   const [modal, setModal] = useState(false);
   const [userActionModalType, setUserActionModalType] =
     useState<UserActionModalType>(UserActionModalType.NONE);
@@ -70,27 +79,49 @@ const Header: FC = () => {
     formState: { errors },
     control,
     handleSubmit,
-    reset
+    reset,
+    setValue
   } = useForm<FieldValues>({
     mode: 'onChange',
     defaultValues: {
       name: '',
-      address: ''
+      address: '',
+      telephone: ''
     },
     resolver: yupResolver(
       Yup.object().shape({
         name: Yup.string().required('Tên người nhận là bắt buộc'),
-        address: Yup.string().required('Địa chỉ là bắt buộc')
+        address: Yup.string().required('Địa chỉ là bắt buộc'),
+        telephone: Yup.string().matches(
+          phoneRegExp,
+          'Số điện thoại không đạt yêu cầu'
+        )
       })
     )
   });
 
   const handleOnClickSubmit = useCallback(
-    (value: any) => {
-      setPaymentStep(3);
-      reset();
+    async (value: any) => {
+      try {
+        await paymentBill({
+          userId: String(user?._id),
+          address: value.address,
+          cash: 'unknown',
+          items: cart.map((each) => each.id),
+          lastModify: new Date(),
+          telephone: value.telephone,
+          quantity: cart.map((each) => each.quantity)
+        });
+
+        setPaymentStep(3);
+      } catch (error) {
+        notification.error({
+          message: 'Có lỗi xảy ra khi xử lý thanh toán',
+          duration: 2
+        });
+      }
     },
-    [reset]
+    [cart, user?._id]
   );
 
   const renderContentByStep = useMemo(() => {
@@ -191,6 +222,24 @@ const Header: FC = () => {
             }}
           />
 
+          <InfoTitle>Số điện thoại </InfoTitle>
+          <Controller
+            name="telephone"
+            control={control}
+            render={({ field: { value, onChange, ref } }) => {
+              return (
+                <InputUI
+                  ref={ref}
+                  value={value}
+                  errors={errors}
+                  name="telephone"
+                  onChange={onChange}
+                  marginNone="marginNone"
+                />
+              );
+            }}
+          />
+
           <ScrollableCart itemProp="250px" style={{ marginTop: 25 }}>
             {cart?.map((item, index) => (
               <CartItem key={item.quantity + index}>
@@ -208,7 +257,7 @@ const Header: FC = () => {
                       <span
                         style={{ fontWeight: '600', color: ColorPalette.red_4 }}
                       >
-                        {item.price} đ
+                        {item.price}
                       </span>
                     </FlexBetween>
                   </div>
@@ -229,7 +278,7 @@ const Header: FC = () => {
     );
   }, [cart, paymentStep, dispatch, control, errors]);
 
-  const handleOnProceedCartModal = useCallback(() => {
+  const handleOnProceedCartModal = useCallback(async () => {
     if (paymentStep === 1) {
       return setPaymentStep(2);
     }
@@ -239,9 +288,13 @@ const Header: FC = () => {
       return handleSubmit(handleOnClickSubmit)();
     }
 
+    if (paymentStep === 3) {
+      dispatch(setCart({ data: [] }));
+    }
+
     setModal(false);
     setPaymentStep(1);
-  }, [handleOnClickSubmit, handleSubmit, paymentStep]);
+  }, [dispatch, handleOnClickSubmit, handleSubmit, paymentStep]);
 
   const renderConfirmCartText = useMemo(() => {
     if (paymentStep === 1) {
@@ -296,7 +349,7 @@ const Header: FC = () => {
         confirmText={renderConfirmCartText}
         disableConfirm={!cart.length}
         content={renderContentByStep}
-        onProceed={() => handleOnProceedCartModal()}
+        onProceed={async () => handleOnProceedCartModal()}
       />
     );
   }, [
@@ -394,6 +447,50 @@ const Header: FC = () => {
   const handleRedirectHome = useCallback(() => {
     navigate('/');
   }, [navigate]);
+
+  useEffect(() => {
+    if (profile) {
+      setValue('name', `${profile?.firstName} ${profile?.lastName}` || '');
+      if (
+        profile?.address &&
+        profile?.province &&
+        profile?.district &&
+        profile?.ward &&
+        province &&
+        district &&
+        ward
+      ) {
+        const currentProvince = province.find(
+          (each) => each.province_id === profile?.province
+        );
+
+        const currentDistrict = district.find(
+          (each) => each.district_id === profile?.district
+        );
+
+        const currentWard = ward.find((each) => each.ward_id === profile?.ward);
+
+        const address = `${profile?.address}, ${currentWard?.ward_name}, ${currentDistrict?.district_name}, ${currentProvince?.province_name}`;
+        setValue('address', address);
+      } else {
+        setValue('address', '');
+      }
+    }
+  }, [district, profile, province, setValue, ward]);
+
+  useEffect(() => {
+    dispatch(getProvinceActionRequest());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (profile && profile?.district) {
+      dispatch(getDistrictActionRequest({ provinceId: profile?.district }));
+    }
+
+    if (profile && profile?.ward) {
+      dispatch(getWardActionRequest({ districtId: profile?.ward }));
+    }
+  }, [dispatch, profile]);
 
   return (
     <>
