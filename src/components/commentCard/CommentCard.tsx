@@ -1,9 +1,20 @@
 import Rating from 'components/Rating/Rating';
-import { forwardRef, HTMLAttributes, useCallback, useId } from 'react';
+import {
+  Dispatch,
+  forwardRef,
+  HTMLAttributes,
+  MouseEvent,
+  SetStateAction,
+  useCallback,
+  useId,
+  useMemo
+} from 'react';
 import { ColorPalette } from 'constants/style.constant';
 import moment from 'helpers/moment';
 import Tooltip from 'antd/es/tooltip';
-import { Empty, Spin } from 'antd';
+import { Empty, Popover, Spin } from 'antd';
+import StackUI from 'components/Stack/StackUI';
+import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import {
   CommentCardContainer,
   ImageWrapper,
@@ -26,6 +37,8 @@ interface CommentCardProps extends HTMLAttributes<HTMLDivElement> {
   commentUserID?: string;
   disableStar?: boolean;
   imgWrapperWidth?: string;
+  setOpenModal?: Dispatch<SetStateAction<boolean>>;
+  setIdComment?: Dispatch<SetStateAction<string | undefined>>;
 }
 
 const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
@@ -40,6 +53,8 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
     loading,
     disableStar = false,
     imgWrapperWidth,
+    setOpenModal,
+    setIdComment,
     ...other
   } = props;
   const uniqueKey = useId();
@@ -47,6 +62,37 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
   const handleChangeStar = useCallback((star: number) => {
     // TODO: Call API change Rating
   }, []);
+
+  const handleClickEditBtn = (e: MouseEvent<HTMLDivElement>) => {
+    console.log('e', e);
+  };
+
+  const handleClickDeleteBtn = () => {
+    setOpenModal && setOpenModal(true);
+    setIdComment && setIdComment(commentUserID);
+  };
+
+  const tooltipMoreMemo = useMemo(() => {
+    if (!commentUserID) {
+      return null;
+    }
+    return (
+      <>
+        <StackUI
+          width={160}
+          icon={<EditOutlined />}
+          content="Sửa"
+          onClick={(e) => console.log(e)}
+        />
+        <StackUI
+          width={160}
+          icon={<DeleteOutlined />}
+          content="Xóa"
+          onClick={handleClickDeleteBtn}
+        />
+      </>
+    );
+  }, [commentUserID, handleClickDeleteBtn]);
 
   return (
     <CommentCardContainer
@@ -87,6 +133,19 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
           )}
         </div>
       </ContentWrapper>
+      <Popover content={tooltipMoreMemo} placement="left" trigger="click">
+        <MoreOutlined
+          style={{
+            cursor: 'pointer',
+            fontSize: 18,
+            color: ColorPalette.gray_3_1,
+            position: 'absolute',
+            top: 10,
+            right: 25,
+            userSelect: 'none'
+          }}
+        />
+      </Popover>
     </CommentCardContainer>
   );
 });

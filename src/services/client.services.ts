@@ -3,6 +3,11 @@ import request from './axios.connection';
 import {
   CheckEmailExistDataResponse,
   CheckEmailExistResponse,
+  Comment,
+  CommentList,
+  CommentListResponse,
+  CommentResponse,
+  CommentWithoutId,
   CreateNewAccountBody,
   CreateNewAccountDataResponse,
   CreateNewAccountResponse,
@@ -144,6 +149,43 @@ export const paymentBill = async (params: {
 export const getAllReceipt = async (userId: string): Promise<Receipt[]> => {
   const response: AxiosResponse<{ data: Receipt[] }> = await request.get(
     `/api/receipt/${userId}`
+  );
+  return response.data.data;
+};
+
+export const getCommentList = async (id: string): Promise<CommentList[]> => {
+  const response: CommentListResponse = await request.get(`/api/laptop/${id}`);
+  return response.data.comments;
+};
+
+export const addNewComment = async (
+  params: CommentWithoutId
+): Promise<Comment> => {
+  const response: CommentResponse = await request.post(
+    `/api/laptop/comment`,
+    params
+  );
+  return response.data.data;
+};
+
+export const updateCommentById = async (
+  commentId: string,
+  params: CommentWithoutId
+): Promise<Comment> => {
+  const response: CommentResponse = await request.put(
+    `/api/laptop/comment/${commentId}`,
+    params
+  );
+  return response.data.data;
+};
+
+export const deleteCommentById = async (
+  commentId: string,
+  params: { userId: string }
+): Promise<Comment> => {
+  const response: CommentResponse = await request.delete(
+    `/api/laptop/comment/${commentId}`,
+    { data: params }
   );
   return response.data.data;
 };

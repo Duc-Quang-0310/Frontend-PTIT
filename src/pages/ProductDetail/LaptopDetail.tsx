@@ -58,6 +58,9 @@ const LaptopDetail: FC = () => {
   const dispatch = useAppDispatch();
   const { handleUpdateFavoriteItem } = useFavoriteLaptop();
   const { laptopDetail } = useAppSelector((state) => state.laptop);
+  const commentLength = useAppSelector(
+    (state) => state.comment.allComment
+  ).length;
   const { favoriteItem, user } = useAppSelector((state) => state.auth);
   const [, startTransition] = useTransition();
   const imgList = useMemo(
@@ -69,7 +72,7 @@ const LaptopDetail: FC = () => {
   );
   const [imgIndex, setImgIndex] = useState(0);
   const [openModalImg, setOpenModalImg] = useState(false);
-  const HASH = 160;
+  const HASH = commentLength;
 
   const inFavoriteItem = useMemo(
     () =>
@@ -220,7 +223,9 @@ const LaptopDetail: FC = () => {
             disabled
             style={{ fontSize: '16px', marginBlock: 'auto' }}
           />
-          <span style={{ color: ColorPalette.gray_8 }}>160 Lượt đánh giá</span>
+          <span style={{ color: ColorPalette.gray_8 }}>
+            {commentLength} Lượt đánh giá
+          </span>
         </FlexBasic>
         <h4>{laptopDetail?.price || UPDATE}</h4>
         <InfoBodyWrapper>

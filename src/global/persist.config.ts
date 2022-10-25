@@ -1,6 +1,7 @@
 import { PersistConfig, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import AuthSlice from './common/auth/auth.slice';
+import CommentSlice from './common/comment/comment.slice';
 import CounterSlice from './common/counter/counter.slice';
 import LaptopSlice from './common/laptop/laptop.slice';
 
@@ -30,8 +31,14 @@ const laptopPersistConfig: PersistConfig<any, unknown, unknown, unknown> = {
   whitelist: ['allLaptop']
 };
 
+const commentPersistConfig: PersistConfig<any, unknown, unknown, unknown> = {
+  key: 'comment',
+  storage
+};
+
 export default {
   counter: persistReducer(counterPersistConfig, CounterSlice),
   auth: persistReducer(authPersistConfig, AuthSlice),
-  laptop: persistReducer(laptopPersistConfig, LaptopSlice)
+  laptop: persistReducer(laptopPersistConfig, LaptopSlice),
+  comment: persistReducer(commentPersistConfig, CommentSlice)
 };

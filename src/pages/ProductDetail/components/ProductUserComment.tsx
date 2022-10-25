@@ -3,28 +3,57 @@ import TextArea from 'antd/lib/input/TextArea';
 import * as Yup from 'yup';
 import CommentCard from 'components/commentCard/CommentCard';
 import ButtonUI from 'components/Button/ButtonUI';
-import { FC, useId, useMemo, useCallback, useEffect, memo } from 'react';
+import {
+  FC,
+  useId,
+  useMemo,
+  useCallback,
+  useEffect,
+  memo,
+  useState
+} from 'react';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
-import { Rate } from 'antd';
-import { FieldValues, useForm, Controller } from 'react-hook-form';
+import { notification, Rate } from 'antd';
+import { useForm, Controller } from 'react-hook-form';
+import { CommentList, CommentWithoutId } from 'services/client.interface';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import {
+  createNewCommentActionRequest,
+  deleteCommentByIdActionRequest,
+  getCommentListActionRequest
+} from 'global/common/comment/comment.slice';
+import ModalUI from 'components/Modal/ModalUI';
 import { CommentBlock, InputBlock } from '../style/LaptopDetail';
 
 interface ProductUserCommentProps {
   id?: string;
 }
 
+interface CommentFieldValues {
+  comment: string;
+  star: 1 | 2 | 3 | 4 | 5;
+}
+
 const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
   const uniqueId = useId();
 
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [idComment, setIdComment] = useState<string>();
+
+  const dispatch = useAppDispatch();
+  const idUser = useAppSelector((globalState) => globalState.auth.user?._id);
+  const { allComment, message, success } = useAppSelector(
+    (globalState) => globalState.comment
+  );
   const schema = useMemo(
     () =>
       Yup.object().shape({
         comment: Yup.string()
           .trim()
+          .required('Bình luận không được để trống')
           .min(1, 'Bình luận quá ngắn')
-          .max(400, 'Bình luận quá dài')
-          .required('Bình luận không được để trống'),
-        star: Yup.number().min(0).max(5)
+          .max(400, 'Bình luận quá dài'),
+        rating: Yup.number().min(1).max(5)
       }),
     []
   );
@@ -35,18 +64,50 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
     clearErrors,
     setFocus,
     control
-  } = useForm<FieldValues>({
+  } = useForm<CommentFieldValues>({
     mode: 'onChange',
     defaultValues: {
       comment: '',
-      star: 3
+      star: 5
     },
     resolver: yupResolver(schema)
   });
 
-  const handleSubmitComment = useCallback((value: any) => {
-    // Call API
-  }, []);
+  const handleSubmitComment = useCallback(
+    (value: CommentFieldValues) => {
+      const newValue: CommentWithoutId = {
+        comment: value.comment,
+        laptopId: id as string,
+        rating: value.star,
+        userId: idUser as string
+      };
+
+      dispatch(createNewCommentActionRequest(newValue));
+    },
+    [dispatch, id, idUser]
+  );
+
+  const handleCancelModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleClickConfirmDelete = () => {
+    dispatch(
+      deleteCommentByIdActionRequest({
+        commentId: idComment as string,
+        userId: idUser as string
+      })
+    );
+    setOpenModal(false);
+    notification[success ? 'success' : 'error']({
+      message: 'Xóa bình luận',
+      description: message
+    });
+  };
+
+  useEffect(() => {
+    dispatch(getCommentListActionRequest(id as string));
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (errors) {
@@ -77,7 +138,7 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
               autoSize={false}
               allowClear
               placeholder="Nhập bình luận của bạn"
-              onPressEnter={() => handleSubmit(handleSubmitComment)}
+              onPressEnter={handleSubmit(handleSubmitComment)}
               onChange={onChange}
               value={value}
             />
@@ -91,24 +152,45 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
 
           <ButtonUI
             content="Bình luận"
-            onClick={() => handleSubmit(handleSubmitComment)}
+            onClick={handleSubmit(handleSubmitComment)}
             style={{ marginLeft: 'auto' }}
           />
         </FlexBetween>
       </InputBlock>
-      <CommentBlock>
-        <CommentCard
-          authorName="Kenny Wilson"
-          content="We love Discovery Our designers were using it for their projects, so we already knew what kind of design they want."
-          userAvatar="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-          starRate={5}
-          disableStar
-          style={{
-            height: 130
-          }}
-          imgWrapperWidth="100px"
-        />
-      </CommentBlock>
+
+      {allComment.map((commentItem: CommentList) => (
+        <CommentBlock key={commentItem._id}>
+          <CommentCard
+            authorName={`${commentItem.userProfile?.[0]?.lastName} ${commentItem.userProfile?.[0]?.firstName}`}
+            content={commentItem.comment}
+            userAvatar={`${commentItem.userProfile?.[0]?.avatar}`}
+            starRate={commentItem.rating}
+            disableStar
+            style={{
+              height: 130
+            }}
+            imgWrapperWidth="100px"
+            date={
+              commentItem.userId.updatedAt
+                ? commentItem.userId.updatedAt
+                : commentItem.userId.createdAt
+            }
+            commentUserID={commentItem._id}
+            setOpenModal={setOpenModal}
+            setIdComment={setIdComment}
+          />
+        </CommentBlock>
+      ))}
+
+      <ModalUI
+        open={openModal}
+        onCancel={handleCancelModal}
+        modalTitle={'Xác nhận'}
+        modalColorType="purple"
+        content={'Bạn có chắc muốn xóa bình luận này'}
+        onProceed={handleClickConfirmDelete}
+        width={500}
+      />
     </div>
   );
 };
