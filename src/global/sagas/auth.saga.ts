@@ -19,7 +19,9 @@ import {
   passwordRecoverActionComplete,
   passwordRecoverActionRequest,
   changePasswordActionComplete,
-  changePasswordActionRequest
+  changePasswordActionRequest,
+  getAllReceiptsComplete,
+  getAllReceiptsRequest
 } from 'global/common/auth/auth.slice';
 import { setLocalStorageItem } from 'helpers/storage';
 import { all, call, put, takeLatest } from 'redux-saga/effects';
@@ -31,12 +33,14 @@ import {
   LoginToExistedAccountData,
   Profiles,
   ProvinceData,
+  Receipt,
   WardData
 } from 'services/client.interface';
 import {
   changePassword,
   createNewAccount,
   getAllProfile,
+  getAllReceipt,
   getDistrict,
   getProvince,
   getWard,
@@ -254,6 +258,17 @@ function* changePasswordSaga(
   }
 }
 
+function* getAllReceiptSaga(action: PayloadAction<string>) {
+  try {
+    yield put(clearErr());
+    const res: Receipt[] = yield call(() => getAllReceipt(action.payload));
+
+    yield put(getAllReceiptsComplete(res));
+  } catch (error: any) {
+    yield put(getAllReceiptsComplete([]));
+  }
+}
+
 export default function* authSaga() {
   yield all([
     takeLatest(createNewAccountActionRequest.type, createNewAccountActionSaga),
@@ -267,6 +282,7 @@ export default function* authSaga() {
     ),
     takeLatest(getListImgProfileRequest.type, getListProfileSaga),
     takeLatest(passwordRecoverActionRequest.type, passwordRecoverSaga),
-    takeLatest(changePasswordActionRequest.type, changePasswordSaga)
+    takeLatest(changePasswordActionRequest.type, changePasswordSaga),
+    takeLatest(getAllReceiptsRequest.type, getAllReceiptSaga)
   ]);
 }

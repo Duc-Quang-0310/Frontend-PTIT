@@ -18,6 +18,7 @@ import {
   Profiles,
   ProvinceData,
   ProvinceResponse,
+  Receipt,
   WardData,
   WardResponse
 } from './client.interface';
@@ -125,4 +126,24 @@ export const changePassword = async (params: {
     params
   );
   return response.data.message;
+};
+
+export const paymentBill = async (params: {
+  userId: string;
+  items: string[];
+  cash: string;
+  lastModify: Date;
+  telephone: string;
+  address: string;
+  quantity: number[];
+}) => {
+  const response = await request.post(`/api/receipt`, params);
+  return response.status;
+};
+
+export const getAllReceipt = async (userId: string): Promise<Receipt[]> => {
+  const response: AxiosResponse<{ data: Receipt[] }> = await request.get(
+    `/api/receipt/${userId}`
+  );
+  return response.data.data;
 };

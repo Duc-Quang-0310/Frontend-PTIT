@@ -191,6 +191,18 @@ export interface FavoriteItem {
   id: string;
 }
 
+export interface Receipt {
+  _id: string;
+  userId: User;
+  items: Laptop[];
+  cash: string;
+  telephone: string;
+  address: string;
+  lastModify: string;
+  quantity?: number[];
+  __v: number;
+}
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 

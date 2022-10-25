@@ -6,6 +6,7 @@ import {
   FavoriteItem,
   Profiles,
   Province,
+  Receipt,
   User,
   Ward
 } from 'services/client.interface';
@@ -25,6 +26,7 @@ export interface AuthState {
   listProfileImgs: string[];
   internalLoading: boolean;
   favoriteItem: FavoriteItem[];
+  receipts: Receipt[];
 }
 
 const initialState: AuthState = {
@@ -41,7 +43,8 @@ const initialState: AuthState = {
   profile: null,
   listProfileImgs: [],
   internalLoading: false,
-  favoriteItem: []
+  favoriteItem: [],
+  receipts: []
 };
 
 export const authSlice = createSlice({
@@ -300,6 +303,21 @@ export const authSlice = createSlice({
       success: action.payload.success,
       message: action.payload.message,
       internalLoading: false
+    }),
+    getAllReceiptsRequest: (
+      state: AuthState,
+      action: PayloadAction<string>
+    ) => ({
+      ...state,
+      internalLoading: true
+    }),
+    getAllReceiptsComplete: (
+      state: AuthState,
+      action: PayloadAction<any[]>
+    ) => ({
+      ...state,
+      internalLoading: false,
+      receipts: action.payload
     })
   }
 });
@@ -327,7 +345,9 @@ export const {
   passwordRecoverActionRequest,
   passwordRecoverActionComplete,
   changePasswordActionRequest,
-  changePasswordActionComplete
+  changePasswordActionComplete,
+  getAllReceiptsRequest,
+  getAllReceiptsComplete
 } = authSlice.actions;
 
 export default authSlice.reducer;
