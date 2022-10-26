@@ -25,16 +25,22 @@ function* createNewCommentActionSaga(action: PayloadAction<CommentWithoutId>) {
 
     yield call(() => addNewComment(action.payload));
 
+    const res: CommentList[] = yield call(() =>
+      getCommentList(action.payload.laptopId)
+    );
+
     yield put(
       createNewCommentActionComplete({
         message: 'Bạn đã bình luận thành công',
-        success: true
+        success: true,
+        commentList: res
       })
     );
   } catch (error) {
     createNewCommentActionComplete({
       message: 'Bạn đã bình luận không thành công',
-      success: false
+      success: false,
+      commentList: []
     });
   }
 }

@@ -59,8 +59,8 @@ const LaptopDetail: FC = () => {
   const { handleUpdateFavoriteItem } = useFavoriteLaptop();
   const { laptopDetail } = useAppSelector((state) => state.laptop);
   const commentLength = useAppSelector(
-    (state) => state.comment.allComment
-  ).length;
+    (state) => state.comment.allComment.length
+  );
   const { favoriteItem, user } = useAppSelector((state) => state.auth);
   const [, startTransition] = useTransition();
   const imgList = useMemo(
@@ -72,7 +72,6 @@ const LaptopDetail: FC = () => {
   );
   const [imgIndex, setImgIndex] = useState(0);
   const [openModalImg, setOpenModalImg] = useState(false);
-  const HASH = commentLength;
 
   const inFavoriteItem = useMemo(
     () =>
@@ -106,14 +105,14 @@ const LaptopDetail: FC = () => {
       {
         label: (
           <>
-            Bình luận <Badge>{HASH}</Badge>
+            Bình luận <Badge>{commentLength}</Badge>
           </>
         ),
         key: `${id}item-3`,
         children: <ProductUserComment id={params.id} />
       }
     ],
-    [params.id, id]
+    [id, params.id, commentLength]
   );
 
   const renderModalProductImg = useMemo(() => {

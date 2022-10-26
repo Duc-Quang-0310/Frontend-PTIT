@@ -21,6 +21,7 @@ export const commentSlice = createSlice({
   reducers: {
     resetCommentState: (state: CommentState) => ({
       ...state,
+      allComment: [],
       message: '',
       success: null,
       loading: false
@@ -34,10 +35,15 @@ export const commentSlice = createSlice({
     }),
     createNewCommentActionComplete: (
       state: CommentState,
-      action: PayloadAction<{ success: boolean; message: string }>
+      action: PayloadAction<{
+        success: boolean;
+        message: string;
+        commentList: CommentList[];
+      }>
     ) => ({
       ...state,
       loading: false,
+      allComment: action.payload.commentList,
       message: action.payload.message,
       success: action.payload.success
     }),
@@ -65,7 +71,10 @@ export const commentSlice = createSlice({
     }),
     deleteCommentByIdActionComplete: (
       state: CommentState,
-      action: PayloadAction<{ message: string; success: boolean }>
+      action: PayloadAction<{
+        message: string;
+        success: boolean;
+      }>
     ) => ({
       ...state,
       loading: false,
