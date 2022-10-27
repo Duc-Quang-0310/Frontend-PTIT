@@ -1,9 +1,20 @@
 import Rating from 'components/Rating/Rating';
-import { forwardRef, HTMLAttributes, useCallback, useId } from 'react';
+import {
+  forwardRef,
+  HTMLAttributes,
+  useCallback,
+  useId,
+  useMemo,
+  useState
+} from 'react';
 import { ColorPalette } from 'constants/style.constant';
 import moment from 'helpers/moment';
 import Tooltip from 'antd/es/tooltip';
-import { Empty, Spin } from 'antd';
+import { Empty, notification, Popover, Spin } from 'antd';
+import StackUI from 'components/Stack/StackUI';
+import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
+import { useAppDispatch, useAppSelector } from 'hooks/redux';
+import { getCommentById } from 'global/common/comment/comment.slice';
 import {
   CommentCardContainer,
   ImageWrapper,
@@ -26,6 +37,9 @@ interface CommentCardProps extends HTMLAttributes<HTMLDivElement> {
   commentUserID?: string;
   disableStar?: boolean;
   imgWrapperWidth?: string;
+  getOpenModal?: (open: boolean) => void;
+  getIdComment?: (id?: string) => void;
+  getClickUpdate?: (click: boolean) => void;
 }
 
 const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
@@ -40,13 +54,84 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
     loading,
     disableStar = false,
     imgWrapperWidth,
+    getOpenModal,
+    getIdComment,
+    getClickUpdate,
     ...other
   } = props;
   const uniqueKey = useId();
 
-  const handleChangeStar = useCallback((star: number) => {
-    // TODO: Call API change Rating
-  }, []);
+  const [openPopover, setOpenPopover] = useState<boolean>(false);
+
+  const dispatch = useAppDispatch();
+  const { allComment } = useAppSelector((state) => state.comment);
+  const idUser = useAppSelector((globalState) => globalState.auth.user?._id);
+
+  const handleClickEditBtn = useCallback(() => {
+    getClickUpdate && getClickUpdate(true);
+    getIdComment && getIdComment(commentUserID);
+    setOpenPopover(false);
+    if (currentID === idUser) {
+      dispatch(
+        getCommentById({
+          commentId: commentUserID as string,
+          commentList: allComment
+        })
+      );
+    } else {
+      dispatch(
+        getCommentById({
+          commentId: commentUserID as string,
+          commentList: []
+        })
+      );
+      notification.error({
+        message: 'Sửa bình luận',
+        description:
+          'Bạn không thể sửa bình luận này do không phải bình luận của bạn'
+      });
+    }
+  }, [
+    allComment,
+    commentUserID,
+    currentID,
+    dispatch,
+    getClickUpdate,
+    getIdComment,
+    idUser
+  ]);
+
+  const handleClickDeleteBtn = useCallback(() => {
+    getOpenModal && getOpenModal(true);
+    getIdComment && getIdComment(commentUserID);
+    setOpenPopover(false);
+  }, [commentUserID, getIdComment, getOpenModal]);
+
+  const tooltipMoreMemo = useMemo(() => {
+    if (!commentUserID) {
+      return null;
+    }
+    return (
+      <>
+        <StackUI
+          width={160}
+          icon={<EditOutlined />}
+          content="Sửa"
+          onClick={handleClickEditBtn}
+        />
+        <StackUI
+          width={160}
+          icon={<DeleteOutlined />}
+          content="Xóa"
+          onClick={handleClickDeleteBtn}
+        />
+      </>
+    );
+  }, [commentUserID, handleClickDeleteBtn, handleClickEditBtn]);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpenPopover(newOpen);
+  };
 
   return (
     <CommentCardContainer
@@ -69,10 +154,9 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
             <>
               <TopSection>
                 <Rating
-                  handleOnChangeStar={handleChangeStar}
                   disabled={disableStar || currentID === commentUserID}
                   style={{ color: ColorPalette.purpleMain }}
-                  defaultValue={starRate}
+                  value={starRate}
                 />
                 <Tooltip title={content}>
                   <BoldTitle>"{content}"</BoldTitle>
@@ -87,6 +171,25 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
           )}
         </div>
       </ContentWrapper>
+      <Popover
+        content={tooltipMoreMemo}
+        placement="left"
+        trigger="click"
+        open={openPopover}
+        onOpenChange={handleOpenChange}
+      >
+        <MoreOutlined
+          style={{
+            cursor: 'pointer',
+            fontSize: 18,
+            color: ColorPalette.gray_3_1,
+            position: 'absolute',
+            top: 10,
+            right: 25,
+            userSelect: 'none'
+          }}
+        />
+      </Popover>
     </CommentCardContainer>
   );
 });

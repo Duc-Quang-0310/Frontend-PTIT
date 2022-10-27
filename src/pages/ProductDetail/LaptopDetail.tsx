@@ -58,6 +58,7 @@ const LaptopDetail: FC = () => {
   const dispatch = useAppDispatch();
   const { handleUpdateFavoriteItem } = useFavoriteLaptop();
   const { laptopDetail } = useAppSelector((state) => state.laptop);
+  const { allComment, loading } = useAppSelector((state) => state.comment);
   const { favoriteItem, user } = useAppSelector((state) => state.auth);
   const [, startTransition] = useTransition();
   const imgList = useMemo(
@@ -69,7 +70,6 @@ const LaptopDetail: FC = () => {
   );
   const [imgIndex, setImgIndex] = useState(0);
   const [openModalImg, setOpenModalImg] = useState(false);
-  const HASH = 160;
 
   const inFavoriteItem = useMemo(
     () =>
@@ -103,14 +103,14 @@ const LaptopDetail: FC = () => {
       {
         label: (
           <>
-            Bình luận <Badge>{HASH}</Badge>
+            Bình luận <Badge>{loading ? '...' : allComment.length}</Badge>
           </>
         ),
         key: `${id}item-3`,
         children: <ProductUserComment id={params.id} />
       }
     ],
-    [params.id, id]
+    [id, params.id, loading, allComment.length]
   );
 
   const renderModalProductImg = useMemo(() => {
@@ -220,7 +220,9 @@ const LaptopDetail: FC = () => {
             disabled
             style={{ fontSize: '16px', marginBlock: 'auto' }}
           />
-          <span style={{ color: ColorPalette.gray_8 }}>160 Lượt đánh giá</span>
+          <span style={{ color: ColorPalette.gray_8 }}>
+            {loading ? 'Đang cập nhật' : allComment.length} lượt đánh giá
+          </span>
         </FlexBasic>
         <h4>{laptopDetail?.price || UPDATE}</h4>
         <InfoBodyWrapper>

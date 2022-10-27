@@ -27,6 +27,9 @@ export interface CreateNewAccountDataResponse {
   message: string;
 }
 
+export interface CreateNewCommentDataResponse
+  extends CreateNewAccountDataResponse {}
+
 export interface CheckEmailExistDataResponse {
   exist: boolean;
 }
@@ -203,6 +206,19 @@ export interface Receipt {
   __v: number;
 }
 
+export interface Comment {
+  _id: string;
+  laptopId: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  comment: string;
+  userId: string;
+  userProfile?: Profiles[];
+}
+
+export type CommentList = Omit<Comment, 'userId'> & { userId: User };
+
+export type CommentWithoutId = Omit<Comment, '_id' | 'userProfile'>;
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 
@@ -222,3 +238,7 @@ export interface LaptopDetailResponse
   extends AxiosResponse<{ laptop: Laptop }, any> {}
 export interface LaptopPaginationResponse
   extends AxiosResponse<Laptop[], any> {}
+export interface CommentResponse
+  extends AxiosResponse<{ data: Comment }, any> {}
+export interface CommentListResponse
+  extends AxiosResponse<{ comments: CommentList[] }, any> {}

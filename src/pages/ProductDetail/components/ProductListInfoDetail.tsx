@@ -83,7 +83,7 @@ const ProductListInfoDetail: FC<ProductListInfoDetailProps> = ({ id }) => {
   const dataSource = useMemo(
     () =>
       infoMemo?.map((item, index) => ({
-        key: `${item.label}at${index}with${id}`,
+        key: `${item.label}${index}${id}`,
         label: convertEnglishPartToVietNam(item.label),
         value: item.value || 'Đang cập nhật'
       })) || [],

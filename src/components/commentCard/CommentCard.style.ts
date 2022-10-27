@@ -5,6 +5,7 @@ export const CommentCardContainer = styled.div`
   width: 100%;
   display: flex;
   height: 200px;
+  position: relative;
 `;
 
 export const ImageWrapper = styled.div`
