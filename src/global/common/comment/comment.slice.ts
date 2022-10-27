@@ -4,6 +4,7 @@ import { CommentList, CommentWithoutId } from 'services/client.interface';
 interface CommentState {
   allComment: CommentList[];
   updatedComment: CommentList | null;
+  deletedComment: CommentList | null;
   message: string;
   success: boolean | null;
   loading: boolean;
@@ -12,6 +13,7 @@ interface CommentState {
 const initialState: CommentState = {
   allComment: [],
   updatedComment: null,
+  deletedComment: null,
   message: '',
   success: null,
   loading: false
@@ -121,7 +123,11 @@ export const commentSlice = createSlice({
     }),
     deleteCommentByIdActionRequest: (
       state: CommentState,
-      action: PayloadAction<{ commentId: string; userId: string }>
+      action: PayloadAction<{
+        commentId: string;
+        userId: string;
+        onSuccess?: Function;
+      }>
     ) => ({
       ...state,
       loading: true
@@ -154,6 +160,20 @@ export const commentSlice = createSlice({
       loading: false,
       message: action.payload.message,
       success: action.payload.success
+    }),
+    setUpdatedComment: (
+      state: CommentState,
+      action: PayloadAction<CommentList | null>
+    ) => ({
+      ...state,
+      updatedComment: action.payload
+    }),
+    setDeletedComment: (
+      state: CommentState,
+      action: PayloadAction<CommentList | null>
+    ) => ({
+      ...state,
+      deletedComment: action.payload
     })
   }
 });
@@ -170,7 +190,9 @@ export const {
   deleteCommentByIdActionRequest,
   deleteCommentByIdActionComplete,
   updateCommentByIdActionRequest,
-  updateCommentByIdActionComplete
+  updateCommentByIdActionComplete,
+  setUpdatedComment,
+  setDeletedComment
 } = commentSlice.actions;
 
 export default commentSlice.reducer;

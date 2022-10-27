@@ -1,4 +1,5 @@
 import { PayloadAction } from '@reduxjs/toolkit';
+import { notification } from 'antd';
 import {
   createNewCommentActionComplete,
   createNewCommentActionRequest,
@@ -21,24 +22,33 @@ import {
 
 function* createNewCommentActionSaga(action: PayloadAction<CommentWithoutId>) {
   try {
+    const { onSuccess, ...other } = action.payload;
+
     yield put(resetCommentState());
 
-    yield call(() => addNewComment(action.payload));
+    yield call(() => addNewComment(other));
 
     const res: CommentList[] = yield call(() =>
       getCommentList(action.payload.laptopId)
     );
 
+    onSuccess?.();
+    notification.success({
+      message: 'Bình luận của bạn đã được ghi nhận'
+    });
     yield put(
       createNewCommentActionComplete({
-        message: 'Bạn đã bình luận thành công',
+        message: 'Bình luận của bạn đã được ghi nhận',
         success: true,
         commentList: res
       })
     );
   } catch (error) {
+    notification.success({
+      message: 'Có lỗi xảy ra khi bình luận'
+    });
     createNewCommentActionComplete({
-      message: 'Bạn đã bình luận không thành công',
+      message: 'Có lỗi xảy ra khi bình luận',
       success: false,
       commentList: []
     });
@@ -55,21 +65,32 @@ function* getCommentListActionSaga(action: PayloadAction<string>) {
 }
 
 function* deleteCommentByIdActionSaga(
-  action: PayloadAction<{ commentId: string; userId: string }>
+  action: PayloadAction<{
+    commentId: string;
+    userId: string;
+    onSuccess?: Function;
+  }>
 ) {
-  const { commentId, userId } = action.payload;
+  const { commentId, userId, onSuccess } = action.payload;
   try {
     yield call(() => deleteCommentById(commentId, { userId }));
+    onSuccess?.();
+    notification.success({
+      message: 'Xóa bình luận thành công'
+    });
     yield put(
       deleteCommentByIdActionComplete({
-        message: 'Bạn đã xóa bình luận thành công',
+        message: 'Xóa bình luận thành công',
         success: true
       })
     );
   } catch (error) {
+    notification.error({
+      message: 'Xóa bình luận thất bại, vui lòng thử lại sau'
+    });
     yield put(
       deleteCommentByIdActionComplete({
-        message: 'Bạn xóa bình luận không thành công',
+        message: 'Bạn xóa bình luận thất bại, vui lòng thử lại sau',
         success: false
       })
     );
@@ -80,8 +101,13 @@ function* updateCommentByIdActionSaga(
   action: PayloadAction<{ params: CommentWithoutId; commentId: string }>
 ) {
   const { commentId, params } = action.payload;
+  const { onSuccess, ...other } = params;
   try {
-    yield call(() => updateCommentById(commentId, params));
+    yield call(() => updateCommentById(commentId, other));
+    onSuccess?.();
+    notification.success({
+      message: 'Cập nhật bình luận thành công'
+    });
     yield put(
       updateCommentByIdActionComplete({
         message: 'Bạn đã cập nhật bình luận thành công',
@@ -89,9 +115,12 @@ function* updateCommentByIdActionSaga(
       })
     );
   } catch (error) {
+    notification.success({
+      message: 'Cập nhật bình luận thất bại, vui lòng thử lại sau'
+    });
     yield put(
       updateCommentByIdActionComplete({
-        message: 'Bạn cập nhật bình luận không thành công',
+        message: 'Bạn cập nhật bình luận thất bại, vui lòng thử lại sau',
         success: false
       })
     );

@@ -1,17 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextArea from 'antd/lib/input/TextArea';
 import * as Yup from 'yup';
-import {
-  FC,
-  useId,
-  useMemo,
-  useCallback,
-  useEffect,
-  memo,
-  useState
-} from 'react';
+import { FC, useId, useMemo, useCallback, useEffect, memo } from 'react';
 import { notification, Rate } from 'antd';
 import { useForm, Controller } from 'react-hook-form';
+import { orderBy } from 'lodash';
 import { CommentList, CommentWithoutId } from 'services/client.interface';
 import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import CommentCard from 'components/commentCard/CommentCard';
@@ -20,10 +13,11 @@ import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import {
   createNewCommentActionRequest,
   deleteCommentByIdActionRequest,
+  getCommentListActionComplete,
   getCommentListActionRequest,
-  updateCommentAfterDelete,
-  updateCommentByIdActionRequest,
-  updateCommentListInGlobal
+  setDeletedComment,
+  setUpdatedComment,
+  updateCommentByIdActionRequest
 } from 'global/common/comment/comment.slice';
 import ModalUI from 'components/Modal/ModalUI';
 import { CommentBlock, InputBlock } from '../style/LaptopDetail';
@@ -39,16 +33,22 @@ interface CommentFieldValues {
 
 const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
   const uniqueId = useId();
-
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [idComment, setIdComment] = useState<string>();
-  const [clickUpdate, setClickUpdate] = useState<boolean>(false);
-
   const dispatch = useAppDispatch();
-  const idUser = useAppSelector((globalState) => globalState.auth.user?._id);
-  const { allComment, message, success, updatedComment } = useAppSelector(
-    (globalState) => globalState.comment
-  );
+  const { user } = useAppSelector((globalState) => globalState.auth);
+  const { allComment, updatedComment, loading, deletedComment } =
+    useAppSelector((globalState) => globalState.comment);
+
+  const sortedComment = useMemo(() => {
+    if (allComment.length) {
+      if (allComment.length === 1) {
+        return allComment;
+      }
+
+      return orderBy(allComment, ['updatedAt'], ['desc']);
+    }
+
+    return [];
+  }, [allComment]);
 
   const schema = useMemo(
     () =>
@@ -66,124 +66,140 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
   const {
     handleSubmit,
     formState: { errors },
-    clearErrors,
     setFocus,
     setValue,
-    control
+    control,
+    reset
   } = useForm<CommentFieldValues>({
     mode: 'onChange',
     defaultValues: {
       comment: '',
-      star: 5
+      star: 3
     },
     resolver: yupResolver(schema)
   });
 
   const handleSubmitComment = useCallback(
     (value: CommentFieldValues) => {
-      const newValue: CommentWithoutId = {
-        comment: value.comment,
-        laptopId: id as string,
-        rating: value.star,
-        userId: idUser as string
-      };
+      if (user && id) {
+        const convertedValue: CommentWithoutId = {
+          comment: value.comment,
+          laptopId: id,
+          rating: value.star,
+          userId: String(user._id),
+          updatedAt: new Date()
+        };
 
-      if (clickUpdate) {
-        dispatch(
-          updateCommentByIdActionRequest({
-            commentId: idComment as string,
-            params: newValue
-          })
-        );
-        dispatch(
-          updateCommentListInGlobal({
-            commentId: idComment as string,
-            commentList: allComment,
-            params: newValue
-          })
-        );
-        notification.success({
-          message: 'Cập nhật bình luận',
-          description: message
-        });
-        setClickUpdate(false);
-        setValue('star', 5);
-      } else {
-        dispatch(createNewCommentActionRequest(newValue));
-        notification.success({
-          message: 'Thêm mới bình luận',
-          description: message
-        });
+        if (updatedComment) {
+          dispatch(
+            updateCommentByIdActionRequest({
+              commentId: updatedComment._id,
+              params: {
+                ...convertedValue,
+                onSuccess: () => {
+                  const updatedListComment: CommentList[] = [...allComment].map(
+                    (comment) => {
+                      if (comment._id === updatedComment._id) {
+                        return {
+                          _id: comment._id,
+                          comment: value.comment,
+                          laptopId: comment.laptopId,
+                          rating: value.star,
+                          userId: comment.userId,
+                          updatedAt: new Date().toISOString(),
+                          userProfile: comment?.userProfile
+                        };
+                      }
+                      return comment;
+                    }
+                  );
+                  dispatch(
+                    getCommentListActionComplete(
+                      orderBy(updatedListComment, ['updatedAt'], ['desc'])
+                    )
+                  );
+                  dispatch(setUpdatedComment(null));
+                  reset();
+                }
+              }
+            })
+          );
+        } else {
+          dispatch(
+            createNewCommentActionRequest({
+              ...convertedValue,
+              onSuccess: () => {
+                reset();
+                dispatch(getCommentListActionRequest(id));
+              }
+            })
+          );
+        }
       }
-      setValue('comment', '');
     },
-    [
-      allComment,
-      clickUpdate,
-      dispatch,
-      id,
-      idComment,
-      idUser,
-      message,
-      setValue
-    ]
+    [allComment, dispatch, id, reset, updatedComment, user]
   );
 
-  const handleCancelModal = () => {
-    setOpenModal(false);
-  };
-
-  const handleClickConfirmDelete = () => {
-    dispatch(
-      deleteCommentByIdActionRequest({
-        commentId: idComment as string,
-        userId: idUser as string
-      })
-    );
-    success !== null &&
-      success &&
-      dispatch(
-        updateCommentAfterDelete({
-          commentId: idComment as string,
-          commentList: allComment
-        })
-      );
-    setOpenModal(false);
-    notification[success ? 'success' : 'error']({
-      message: 'Xóa bình luận',
-      description: message
-    });
-  };
-
-  const handleGetOpenModal = (open: boolean) => {
-    setOpenModal(open);
-  };
-
-  const handleGetIdComment = (commentId?: string) => {
-    setIdComment(commentId);
-  };
-
-  const handleClickUpdate = (click: boolean) => {
-    setClickUpdate(click);
-  };
-
   useEffect(() => {
-    if (clickUpdate && updatedComment) {
-      setFocus('comment');
+    if (updatedComment) {
       setValue('star', updatedComment?.rating);
       setValue('comment', updatedComment?.comment);
+      setFocus('comment');
+    } else {
+      setValue('star', 3);
+      setValue('comment', '');
     }
-  }, [clickUpdate, setFocus, setValue, updatedComment]);
+  }, [setFocus, setValue, updatedComment]);
 
-  useEffect(() => {
-    dispatch(getCommentListActionRequest(id as string));
-  }, [dispatch, id]);
+  const handlePreSubmit = useCallback(() => {
+    if (!user) {
+      return notification.error({
+        message: 'Bạn cần đăng nhập để sử dụng chức năng này'
+      });
+    }
+
+    handleSubmit(handleSubmitComment)();
+  }, [handleSubmit, handleSubmitComment, user]);
+
+  const handleAbortUpdate = useCallback(() => {
+    dispatch(setUpdatedComment(null));
+  }, [dispatch]);
+
+  const handleDeleteComment = useCallback(() => {
+    if (deletedComment && user) {
+      dispatch(
+        deleteCommentByIdActionRequest({
+          commentId: deletedComment._id,
+          userId: user._id,
+          onSuccess: () => {
+            const newCommentList = [...allComment].filter(
+              (each) => each._id !== deletedComment._id
+            );
+            dispatch(
+              getCommentListActionComplete(
+                orderBy(newCommentList, ['updatedAt'], ['desc'])
+              )
+            );
+            dispatch(setDeletedComment(null));
+          }
+        })
+      );
+    }
+  }, [allComment, deletedComment, dispatch, user]);
 
   useEffect(() => {
     if (errors) {
       setFocus('comment');
     }
-  }, [clearErrors, errors, setFocus]);
+  }, [errors, setFocus]);
+
+  useEffect(
+    () => () => {
+      dispatch(setUpdatedComment(null));
+      dispatch(setDeletedComment(null));
+    },
+    [dispatch]
+  );
 
   return (
     <div key={uniqueId}>
@@ -208,7 +224,7 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
               autoSize={false}
               allowClear
               placeholder="Nhập bình luận của bạn"
-              onPressEnter={handleSubmit(handleSubmitComment)}
+              onPressEnter={handlePreSubmit}
               onChange={onChange}
               value={value}
             />
@@ -220,15 +236,27 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
             <div className="error-text">{String(errors?.comment?.message)}</div>
           )}
 
-          <ButtonUI
-            content={clickUpdate ? 'Cập nhật' : 'Bình luận'}
-            onClick={handleSubmit(handleSubmitComment)}
-            style={{ marginLeft: 'auto' }}
-          />
+          <>
+            <ButtonUI
+              content={updatedComment ? 'Cập nhật' : 'Bình luận'}
+              onClick={handlePreSubmit}
+              style={{ marginLeft: 'auto' }}
+              loading={loading}
+            />
+
+            {updatedComment && (
+              <ButtonUI
+                content="Hủy"
+                onClick={handleAbortUpdate}
+                style={{ marginLeft: 12 }}
+                loading={loading}
+              />
+            )}
+          </>
         </FlexBetween>
       </InputBlock>
 
-      {[...allComment].reverse().map((commentItem: CommentList) => (
+      {sortedComment.map((commentItem: CommentList) => (
         <CommentBlock key={commentItem._id}>
           <CommentCard
             authorName={`${commentItem.userProfile?.[0]?.firstName} ${commentItem.userProfile?.[0]?.lastName}`}
@@ -240,28 +268,21 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
               height: 130
             }}
             imgWrapperWidth="100px"
-            date={
-              commentItem.userId.updatedAt
-                ? commentItem.userId.updatedAt
-                : commentItem.userId.createdAt
-            }
-            currentID={commentItem.userId._id}
-            commentUserID={commentItem._id}
-            getOpenModal={handleGetOpenModal}
-            getIdComment={handleGetIdComment}
-            getClickUpdate={handleClickUpdate}
+            date={commentItem?.updatedAt}
+            currentID={commentItem._id}
+            commentUserID={commentItem.userId._id}
           />
         </CommentBlock>
       ))}
 
       <ModalUI
-        open={openModal}
-        onCancel={handleCancelModal}
-        modalTitle={'Xác nhận'}
+        open={!!deletedComment}
+        onCancel={() => dispatch(setDeletedComment(null))}
+        modalTitle={'Xác nhận xóa bình luận'}
         modalColorType="purple"
         content={'Bạn có chắc muốn xóa bình luận này'}
-        onProceed={handleClickConfirmDelete}
         width={500}
+        onProceed={handleDeleteComment}
       />
     </div>
   );

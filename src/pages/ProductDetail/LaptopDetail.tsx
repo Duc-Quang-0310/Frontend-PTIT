@@ -10,6 +10,12 @@ import { UPDATE } from 'constants/mock.constants';
 import { ColorPalette } from 'constants/style.constant';
 import { updateCartActionRequest } from 'global/common/auth/auth.slice';
 import {
+  getCommentListActionComplete,
+  getCommentListActionRequest,
+  setDeletedComment,
+  setUpdatedComment
+} from 'global/common/comment/comment.slice';
+import {
   getLaptopDetailComplete,
   getLaptopDetailRequest
 } from 'global/common/laptop/laptop.slice';
@@ -71,6 +77,19 @@ const LaptopDetail: FC = () => {
   const [imgIndex, setImgIndex] = useState(0);
   const [openModalImg, setOpenModalImg] = useState(false);
 
+  const totalRating = useMemo(() => {
+    if (allComment.length === 0) {
+      return 0;
+    }
+
+    const sum = allComment.reduce(
+      (prevSum, comment) => (prevSum += comment?.rating || 0),
+      0
+    );
+
+    return parseInt((sum / allComment.length).toFixed(2), 10);
+  }, [allComment]);
+
   const inFavoriteItem = useMemo(
     () =>
       favoriteItem.length && params?.id
@@ -103,7 +122,10 @@ const LaptopDetail: FC = () => {
       {
         label: (
           <>
-            Bình luận <Badge>{loading ? '...' : allComment.length}</Badge>
+            Bình luận
+            {allComment.length ? (
+              <Badge>{loading ? '...' : allComment.length}</Badge>
+            ) : null}
           </>
         ),
         key: `${id}item-3`,
@@ -132,15 +154,6 @@ const LaptopDetail: FC = () => {
       />
     );
   }, [imgIndex, imgList, openModalImg]);
-
-  useEffect(() => {
-    if (params?.id) {
-      dispatch(getLaptopDetailRequest(params.id));
-    }
-    return () => {
-      dispatch(getLaptopDetailComplete(null));
-    };
-  }, [dispatch, params.id]);
 
   const handleAddToCart = useCallback(() => {
     if (!user) {
@@ -187,6 +200,25 @@ const LaptopDetail: FC = () => {
     }
   }, [handleUpdateFavoriteItem, laptopDetail]);
 
+  useEffect(() => {
+    if (params?.id) {
+      dispatch(getLaptopDetailRequest(params.id));
+      dispatch(getCommentListActionRequest(params?.id));
+    }
+    return () => {
+      dispatch(getLaptopDetailComplete(null));
+    };
+  }, [dispatch, params.id]);
+
+  useEffect(
+    () => () => {
+      dispatch(setUpdatedComment(null));
+      dispatch(setDeletedComment(null));
+      dispatch(getCommentListActionComplete([]));
+    },
+    [dispatch]
+  );
+
   return (
     <LaptopDetailContainer>
       <ImageContainer>
@@ -216,12 +248,13 @@ const LaptopDetail: FC = () => {
         <h3>{laptopDetail?.productName || UPDATE}</h3>
         <FlexBasic style={RatingStyle}>
           <Rating
-            defaultValue={5}
+            defaultValue={totalRating}
             disabled
             style={{ fontSize: '16px', marginBlock: 'auto' }}
           />
           <span style={{ color: ColorPalette.gray_8 }}>
-            {loading ? 'Đang cập nhật' : allComment.length} lượt đánh giá
+            {allComment.length === 0 ? 'Đang cập nhật' : allComment.length} lượt
+            đánh giá
           </span>
         </FlexBasic>
         <h4>{laptopDetail?.price || UPDATE}</h4>
