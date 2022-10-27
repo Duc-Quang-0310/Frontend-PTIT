@@ -213,11 +213,14 @@ export interface Comment {
   comment: string;
   userId: string;
   userProfile?: Profiles[];
+  updatedAt?: Date | string;
 }
 
 export type CommentList = Omit<Comment, 'userId'> & { userId: User };
 
-export type CommentWithoutId = Omit<Comment, '_id' | 'userProfile'>;
+export type CommentWithoutId = Omit<Comment, '_id' | 'userProfile'> & {
+  onSuccess?: Function;
+};
 
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}

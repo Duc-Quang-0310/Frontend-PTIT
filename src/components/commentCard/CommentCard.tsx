@@ -10,11 +10,14 @@ import {
 import { ColorPalette } from 'constants/style.constant';
 import moment from 'helpers/moment';
 import Tooltip from 'antd/es/tooltip';
-import { Empty, notification, Popover, Spin } from 'antd';
+import { Empty, Popover, Spin } from 'antd';
 import StackUI from 'components/Stack/StackUI';
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
-import { getCommentById } from 'global/common/comment/comment.slice';
+import {
+  setDeletedComment,
+  setUpdatedComment
+} from 'global/common/comment/comment.slice';
 import {
   CommentCardContainer,
   ImageWrapper,
@@ -54,84 +57,49 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
     loading,
     disableStar = false,
     imgWrapperWidth,
-    getOpenModal,
-    getIdComment,
-    getClickUpdate,
     ...other
   } = props;
   const uniqueKey = useId();
-
   const [openPopover, setOpenPopover] = useState<boolean>(false);
-
   const dispatch = useAppDispatch();
   const { allComment } = useAppSelector((state) => state.comment);
-  const idUser = useAppSelector((globalState) => globalState.auth.user?._id);
+  const { user } = useAppSelector((globalState) => globalState.auth);
 
-  const handleClickEditBtn = useCallback(() => {
-    getClickUpdate && getClickUpdate(true);
-    getIdComment && getIdComment(commentUserID);
-    setOpenPopover(false);
-    if (currentID === idUser) {
-      dispatch(
-        getCommentById({
-          commentId: commentUserID as string,
-          commentList: allComment
-        })
-      );
-    } else {
-      dispatch(
-        getCommentById({
-          commentId: commentUserID as string,
-          commentList: []
-        })
-      );
-      notification.error({
-        message: 'Sửa bình luận',
-        description:
-          'Bạn không thể sửa bình luận này do không phải bình luận của bạn'
-      });
-    }
-  }, [
-    allComment,
-    commentUserID,
-    currentID,
-    dispatch,
-    getClickUpdate,
-    getIdComment,
-    idUser
-  ]);
-
-  const handleClickDeleteBtn = useCallback(() => {
-    getOpenModal && getOpenModal(true);
-    getIdComment && getIdComment(commentUserID);
-    setOpenPopover(false);
-  }, [commentUserID, getIdComment, getOpenModal]);
+  const handleClickPopoverWithAction = useCallback(
+    (action: 'update' | 'delete') => {
+      const currentItem = allComment.find((each) => each?._id === currentID);
+      if (currentItem) {
+        if (action === 'update') {
+          return dispatch(setUpdatedComment(currentItem));
+        }
+        dispatch(setDeletedComment(currentItem));
+      }
+    },
+    [allComment, currentID, dispatch]
+  );
 
   const tooltipMoreMemo = useMemo(() => {
     if (!commentUserID) {
       return null;
     }
+
     return (
       <>
         <StackUI
           width={160}
           icon={<EditOutlined />}
           content="Sửa"
-          onClick={handleClickEditBtn}
+          onClick={() => handleClickPopoverWithAction('update')}
         />
         <StackUI
           width={160}
           icon={<DeleteOutlined />}
           content="Xóa"
-          onClick={handleClickDeleteBtn}
+          onClick={() => handleClickPopoverWithAction('delete')}
         />
       </>
     );
-  }, [commentUserID, handleClickDeleteBtn, handleClickEditBtn]);
-
-  const handleOpenChange = (newOpen: boolean) => {
-    setOpenPopover(newOpen);
-  };
+  }, [commentUserID, handleClickPopoverWithAction]);
 
   return (
     <CommentCardContainer
@@ -165,31 +133,35 @@ const CommentCard = forwardRef<any, CommentCardProps>((props, ref) => {
 
               <FlexBetween>
                 <BoldAuthor>{authorName}</BoldAuthor>
-                <DateTitle>{moment(date).format('Do MMM, YYYY')}</DateTitle>
+                <DateTitle>
+                  {moment(date).format('Do MMM, YYYY, HH:mm:ss')}
+                </DateTitle>
               </FlexBetween>
             </>
           )}
         </div>
       </ContentWrapper>
-      <Popover
-        content={tooltipMoreMemo}
-        placement="left"
-        trigger="click"
-        open={openPopover}
-        onOpenChange={handleOpenChange}
-      >
-        <MoreOutlined
-          style={{
-            cursor: 'pointer',
-            fontSize: 18,
-            color: ColorPalette.gray_3_1,
-            position: 'absolute',
-            top: 10,
-            right: 25,
-            userSelect: 'none'
-          }}
-        />
-      </Popover>
+      {user && commentUserID === user._id && (
+        <Popover
+          content={tooltipMoreMemo}
+          placement="left"
+          trigger="click"
+          open={openPopover}
+          onOpenChange={(visible) => setOpenPopover(visible)}
+        >
+          <MoreOutlined
+            style={{
+              cursor: 'pointer',
+              fontSize: 18,
+              color: ColorPalette.gray_3_1,
+              position: 'absolute',
+              top: 10,
+              right: 25,
+              userSelect: 'none'
+            }}
+          />
+        </Popover>
+      )}
     </CommentCardContainer>
   );
 });
