@@ -222,6 +222,18 @@ export type CommentWithoutId = Omit<Comment, '_id' | 'userProfile'> & {
   onSuccess?: Function;
 };
 
+export interface UpdateProfileBody {
+  firstName: string;
+  lastName: string;
+  dob: string;
+  address: string;
+  province: string;
+  district: string;
+  ward: string;
+  updatedAt: Date | string;
+  avatar: string;
+}
+
 export interface CreateNewAccountResponse
   extends AxiosResponse<CreateNewAccountDataResponse, any> {}
 
