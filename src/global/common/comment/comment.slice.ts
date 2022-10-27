@@ -3,6 +3,7 @@ import { CommentList, CommentWithoutId } from 'services/client.interface';
 
 interface CommentState {
   allComment: CommentList[];
+  updatedComment: CommentList | null;
   message: string;
   success: boolean | null;
   loading: boolean;
@@ -10,6 +11,7 @@ interface CommentState {
 
 const initialState: CommentState = {
   allComment: [],
+  updatedComment: null,
   message: '',
   success: null,
   loading: false
@@ -22,10 +24,65 @@ export const commentSlice = createSlice({
     resetCommentState: (state: CommentState) => ({
       ...state,
       allComment: [],
+      updatedComment: null,
       message: '',
       success: null,
       loading: false
     }),
+    updateCommentAfterDelete: (
+      state: CommentState,
+      action: PayloadAction<{ commentId: string; commentList: CommentList[] }>
+    ) => {
+      const { commentId, commentList } = action.payload;
+      const res = commentList.filter(
+        (commentItem: CommentList) => commentItem._id !== commentId
+      );
+      return {
+        ...state,
+        allComment: res,
+        loading: false
+      };
+    },
+    getCommentById: (
+      state: CommentState,
+      action: PayloadAction<{ commentId: string; commentList: CommentList[] }>
+    ) => {
+      const { commentId, commentList } = action.payload;
+      let res: CommentList | null = null;
+      commentList.forEach((commentItem: CommentList) => {
+        if (commentItem._id === commentId) res = commentItem;
+      });
+      return {
+        ...state,
+        updatedComment: res,
+        loading: false
+      };
+    },
+    updateCommentListInGlobal: (
+      state: CommentState,
+      action: PayloadAction<{
+        commentId: string;
+        commentList: CommentList[];
+        params: CommentWithoutId;
+      }>
+    ) => {
+      const { commentId, commentList, params } = action.payload;
+      const res: CommentList[] = commentList.map((commentItem: CommentList) => {
+        if (commentItem._id === commentId) {
+          return {
+            ...commentItem,
+            rating: params.rating,
+            comment: params.comment
+          };
+        }
+        return commentItem;
+      });
+      return {
+        ...state,
+        allComment: res,
+        loading: false
+      };
+    },
     createNewCommentActionRequest: (
       state: CommentState,
       action: PayloadAction<CommentWithoutId>
@@ -81,6 +138,7 @@ export const commentSlice = createSlice({
       message: action.payload.message,
       success: action.payload.success
     }),
+
     updateCommentByIdActionRequest: (
       state: CommentState,
       action: PayloadAction<{ params: CommentWithoutId; commentId: string }>
@@ -102,6 +160,9 @@ export const commentSlice = createSlice({
 
 export const {
   resetCommentState,
+  getCommentById,
+  updateCommentAfterDelete,
+  updateCommentListInGlobal,
   createNewCommentActionRequest,
   createNewCommentActionComplete,
   getCommentListActionRequest,

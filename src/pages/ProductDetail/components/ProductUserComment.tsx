@@ -1,8 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import TextArea from 'antd/lib/input/TextArea';
 import * as Yup from 'yup';
-import CommentCard from 'components/commentCard/CommentCard';
-import ButtonUI from 'components/Button/ButtonUI';
 import {
   FC,
   useId,
@@ -12,15 +10,20 @@ import {
   memo,
   useState
 } from 'react';
-import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { notification, Rate } from 'antd';
 import { useForm, Controller } from 'react-hook-form';
 import { CommentList, CommentWithoutId } from 'services/client.interface';
+import { FlexBetween } from 'components/commentCard/CommentCard.style';
+import CommentCard from 'components/commentCard/CommentCard';
+import ButtonUI from 'components/Button/ButtonUI';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import {
   createNewCommentActionRequest,
   deleteCommentByIdActionRequest,
-  getCommentListActionRequest
+  getCommentListActionRequest,
+  updateCommentAfterDelete,
+  updateCommentByIdActionRequest,
+  updateCommentListInGlobal
 } from 'global/common/comment/comment.slice';
 import ModalUI from 'components/Modal/ModalUI';
 import { CommentBlock, InputBlock } from '../style/LaptopDetail';
@@ -39,12 +42,14 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
 
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [idComment, setIdComment] = useState<string>();
+  const [clickUpdate, setClickUpdate] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
   const idUser = useAppSelector((globalState) => globalState.auth.user?._id);
-  const { allComment, message, success } = useAppSelector(
+  const { allComment, message, success, updatedComment } = useAppSelector(
     (globalState) => globalState.comment
   );
+
   const schema = useMemo(
     () =>
       Yup.object().shape({
@@ -63,6 +68,7 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
     formState: { errors },
     clearErrors,
     setFocus,
+    setValue,
     control
   } = useForm<CommentFieldValues>({
     mode: 'onChange',
@@ -82,9 +88,45 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
         userId: idUser as string
       };
 
-      dispatch(createNewCommentActionRequest(newValue));
+      if (clickUpdate) {
+        dispatch(
+          updateCommentByIdActionRequest({
+            commentId: idComment as string,
+            params: newValue
+          })
+        );
+        dispatch(
+          updateCommentListInGlobal({
+            commentId: idComment as string,
+            commentList: allComment,
+            params: newValue
+          })
+        );
+        notification.success({
+          message: 'Cập nhật bình luận',
+          description: message
+        });
+        setClickUpdate(false);
+        setValue('star', 5);
+      } else {
+        dispatch(createNewCommentActionRequest(newValue));
+        notification.success({
+          message: 'Thêm mới bình luận',
+          description: message
+        });
+      }
+      setValue('comment', '');
     },
-    [dispatch, id, idUser]
+    [
+      allComment,
+      clickUpdate,
+      dispatch,
+      id,
+      idComment,
+      idUser,
+      message,
+      setValue
+    ]
   );
 
   const handleCancelModal = () => {
@@ -98,12 +140,40 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
         userId: idUser as string
       })
     );
+    success !== null &&
+      success &&
+      dispatch(
+        updateCommentAfterDelete({
+          commentId: idComment as string,
+          commentList: allComment
+        })
+      );
     setOpenModal(false);
     notification[success ? 'success' : 'error']({
       message: 'Xóa bình luận',
       description: message
     });
   };
+
+  const handleGetOpenModal = (open: boolean) => {
+    setOpenModal(open);
+  };
+
+  const handleGetIdComment = (commentId?: string) => {
+    setIdComment(commentId);
+  };
+
+  const handleClickUpdate = (click: boolean) => {
+    setClickUpdate(click);
+  };
+
+  useEffect(() => {
+    if (clickUpdate && updatedComment) {
+      setFocus('comment');
+      setValue('star', updatedComment?.rating);
+      setValue('comment', updatedComment?.comment);
+    }
+  }, [clickUpdate, setFocus, setValue, updatedComment]);
 
   useEffect(() => {
     dispatch(getCommentListActionRequest(id as string));
@@ -151,17 +221,17 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
           )}
 
           <ButtonUI
-            content="Bình luận"
+            content={clickUpdate ? 'Cập nhật' : 'Bình luận'}
             onClick={handleSubmit(handleSubmitComment)}
             style={{ marginLeft: 'auto' }}
           />
         </FlexBetween>
       </InputBlock>
 
-      {allComment.map((commentItem: CommentList) => (
+      {[...allComment].reverse().map((commentItem: CommentList) => (
         <CommentBlock key={commentItem._id}>
           <CommentCard
-            authorName={`${commentItem.userProfile?.[0]?.lastName} ${commentItem.userProfile?.[0]?.firstName}`}
+            authorName={`${commentItem.userProfile?.[0]?.firstName} ${commentItem.userProfile?.[0]?.lastName}`}
             content={commentItem.comment}
             userAvatar={`${commentItem.userProfile?.[0]?.avatar}`}
             starRate={commentItem.rating}
@@ -175,9 +245,11 @@ const ProductUserComment: FC<ProductUserCommentProps> = ({ id }) => {
                 ? commentItem.userId.updatedAt
                 : commentItem.userId.createdAt
             }
+            currentID={commentItem.userId._id}
             commentUserID={commentItem._id}
-            setOpenModal={setOpenModal}
-            setIdComment={setIdComment}
+            getOpenModal={handleGetOpenModal}
+            getIdComment={handleGetIdComment}
+            getClickUpdate={handleClickUpdate}
           />
         </CommentBlock>
       ))}
