@@ -140,6 +140,18 @@ export const InfoTitle = styled.div`
   font-weight: 600;
   margin-bottom: 10px;
   margin-top: 15px;
+  display: flex;
+
+  span {
+    margin-left: 3px;
+    color: ${ColorPalette.red_5};
+  }
+
+  strong {
+    color: ${ColorPalette.red_5};
+    font-size: 16px;
+    margin-left: auto;
+  }
 `;
 
 export const BillInfo = styled.div`

@@ -23,6 +23,7 @@ const ReceiptHistory = () => {
       username: string,
       date: Date | string,
       address: string,
+      cash: string,
       item: {
         img: string;
         price: string;
@@ -42,6 +43,12 @@ const ReceiptHistory = () => {
         <BillInfo style={{ marginBottom: 10 }}>
           <div className="title">Địa chỉ:</div>
           <span> {address}</span>
+        </BillInfo>
+        <BillInfo style={{ marginBottom: 10 }}>
+          <div className="title">Tổng giá tiền:</div>
+          <span style={{ color: ColorPalette.red_4, fontWeight: '600' }}>
+            {cash}
+          </span>
         </BillInfo>
         <Scrollable>
           {item?.map((each, index) => (
@@ -77,7 +84,7 @@ const ReceiptHistory = () => {
                   <div style={{ fontSize: 15, fontWeight: 'bold' }}>
                     Giá:
                     <span style={{ color: ColorPalette.red_4, marginLeft: 10 }}>
-                      {each.price} đ
+                      {each.price}
                     </span>
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 'bold' }}>
@@ -113,6 +120,7 @@ const ReceiptHistory = () => {
               `${profile?.firstName} ${profile?.lastName}`,
               each.lastModify,
               each.address,
+              each.cash,
               each.items.map((item, index) => ({
                 img: item?.productImg?.[0],
                 name: item?.productName,

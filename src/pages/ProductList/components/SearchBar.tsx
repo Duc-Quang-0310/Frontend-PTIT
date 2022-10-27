@@ -8,7 +8,6 @@ import {
   SetStateAction,
   useCallback
 } from 'react';
-import { Laptop } from 'services/client.interface';
 import {
   ProductListSearchBar,
   ProductListSearchInfo
@@ -45,6 +44,7 @@ const SearchBar = ({
           allowClear
           // value={searchValue}
           onChange={handleChangeSearchInput}
+          placeholder="Tìm kiếm sản phẩm"
           {...props}
         />
       </ProductListSearchBar>

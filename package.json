@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint --fix --quiet --ext=ts,tsx src"
@@ -14,6 +14,7 @@
     "@reduxjs/toolkit": "^1.8.5",
     "antd": "^4.23.2",
     "axios": "^0.27.2",
+    "cloudinary": "^1.32.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "react": "^18.2.0",
@@ -44,6 +45,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "form-data": "^4.0.0",
     "prettier": "^2.7.1",
     "typescript": "^4.6.4",
     "vite": "^3.1.0"

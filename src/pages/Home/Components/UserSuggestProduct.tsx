@@ -94,6 +94,7 @@ const UserSuggestProduct: FC = () => {
               status="Còn hàng"
               id={id}
               onClick={() => id && navigate(routerPaths.LAPTOP_DETAIL(id))}
+              style={{ minHeight: '330px' }}
             />
           </Col>
         ))}

@@ -46,6 +46,7 @@ import {
   InfoBodyWrapper,
   Badge
 } from './style/LaptopDetail';
+import './style/laptop-detail.css';
 
 const btnStyle: CSSProperties = {
   borderRadius: '6px',

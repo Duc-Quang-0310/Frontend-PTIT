@@ -7,7 +7,7 @@ export const ProductCardContainer = styled.div`
   overflow: hidden;
   -webkit-box-shadow: 12px 1px 14px 4px rgba(118, 118, 118, 0.27);
   box-shadow: 12px 1px 14px 4px rgba(118, 118, 118, 0.27);
-  height: 330px;
+  min-height: 330px;
 `;
 
 export const ImageWrap = styled.div`

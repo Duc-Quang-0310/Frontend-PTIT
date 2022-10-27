@@ -8,7 +8,7 @@ import {
   LogoutOutlined,
   UserOutlined
 } from '@ant-design/icons';
-import { notification, Popover, Result } from 'antd';
+import { notification, Popover, Result, Badge } from 'antd';
 import { CartIcon } from 'components/Images/CartIcon';
 import { Logo } from 'components/Images/Logo';
 import UserIcon from 'components/Images/UserIcon';
@@ -40,6 +40,7 @@ import { FlexBetween } from 'components/commentCard/CommentCard.style';
 import { UserActionModalType } from 'constants/user.constants';
 import { phoneRegExp } from 'constants/mock.constants';
 import { paymentBill } from 'services/client.services';
+import { sumUpTotalPrice } from 'helpers/price';
 import {
   getDistrictActionRequest,
   getProvinceActionRequest,
@@ -72,6 +73,8 @@ const Header: FC = () => {
     useState<UserActionModalType>(UserActionModalType.NONE);
   const [paymentStep, setPaymentStep] = useState(1);
   const navigate = useNavigate();
+
+  const priceInTotal = useMemo(() => sumUpTotalPrice(cart), [cart]);
 
   const { pathname } = useLocation();
 
@@ -106,7 +109,7 @@ const Header: FC = () => {
         await paymentBill({
           userId: String(user?._id),
           address: value.address,
-          cash: 'unknown',
+          cash: priceInTotal,
           items: cart.map((each) => each.id),
           lastModify: new Date(),
           telephone: value.telephone,
@@ -121,7 +124,7 @@ const Header: FC = () => {
         });
       }
     },
-    [cart, user?._id]
+    [cart, priceInTotal, user?._id]
   );
 
   const renderContentByStep = useMemo(() => {
@@ -186,7 +189,10 @@ const Header: FC = () => {
     if (paymentStep === 2) {
       return (
         <div>
-          <InfoTitle>Tên người nhận </InfoTitle>
+          <InfoTitle>
+            Tên người nhận
+            <span>*</span>
+          </InfoTitle>
           <Controller
             name="name"
             control={control}
@@ -210,7 +216,10 @@ const Header: FC = () => {
             }}
           />
 
-          <InfoTitle>Địa chỉ người nhận </InfoTitle>
+          <InfoTitle>
+            Địa chỉ người nhận
+            <span>*</span>
+          </InfoTitle>
           <Controller
             name="address"
             control={control}
@@ -234,7 +243,10 @@ const Header: FC = () => {
             }}
           />
 
-          <InfoTitle>Số điện thoại </InfoTitle>
+          <InfoTitle>
+            Số điện thoại
+            <span>*</span>
+          </InfoTitle>
           <Controller
             name="telephone"
             control={control}
@@ -257,6 +269,11 @@ const Header: FC = () => {
               );
             }}
           />
+
+          <InfoTitle>
+            Tổng giá tiền:
+            <strong>{priceInTotal}</strong>
+          </InfoTitle>
 
           <ScrollableCart itemProp="250px" style={{ marginTop: 25 }}>
             {cart?.map((item, index) => (
@@ -294,7 +311,7 @@ const Header: FC = () => {
         subTitle="Bạn hãy đợi nhân viên của chúng tôi liên lạc trong khoảng thời gian gần nhất"
       />
     );
-  }, [cart, paymentStep, dispatch, control, errors]);
+  }, [cart, paymentStep, dispatch, control, priceInTotal, errors]);
 
   const handleOnProceedCartModal = useCallback(async () => {
     if (paymentStep === 1) {
@@ -302,7 +319,6 @@ const Header: FC = () => {
     }
 
     if (paymentStep === 2) {
-      // TODO call API
       return handleSubmit(handleOnClickSubmit)();
     }
 
@@ -407,6 +423,7 @@ const Header: FC = () => {
             content="Đăng xuất"
             onClick={() => {
               dispatch(resetAuthState());
+              navigate('/');
             }}
           />
           <StackUI
@@ -511,12 +528,14 @@ const Header: FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (profile && profile?.district) {
-      dispatch(getDistrictActionRequest({ provinceId: profile?.district }));
+    if (profile?.district) {
+      dispatch(
+        getDistrictActionRequest({ provinceId: String(profile.province) })
+      );
     }
 
-    if (profile && profile?.ward) {
-      dispatch(getWardActionRequest({ districtId: profile?.ward }));
+    if (profile?.ward) {
+      dispatch(getWardActionRequest({ districtId: String(profile.district) }));
     }
   }, [dispatch, profile]);
 
@@ -537,7 +556,7 @@ const Header: FC = () => {
             Trang chủ
           </span>
           <span
-            className={pathname === '/laptop' ? 'active' : ''}
+            className={pathname.includes('/laptop') ? 'active' : ''}
             onClick={() => navigate(routerPaths.PRODUCT_LIST)}
           >
             Sản phẩm
@@ -554,13 +573,15 @@ const Header: FC = () => {
         </PageNavigation>
         <ListIconWrapper>
           {profile && (
-            <IconWrapper
-              className="icon-wrapper"
-              key={`${uniqueKey}cart-icon`}
-              onClick={handleClickCart}
-            >
-              <CartIcon blockHeight="100%" blockWidth={20} />
-            </IconWrapper>
+            <Badge count={cart?.length || 0} size="small" offset={[-3, 7]}>
+              <IconWrapper
+                className="icon-wrapper"
+                key={`${uniqueKey}cart-icon`}
+                onClick={handleClickCart}
+              >
+                <CartIcon blockHeight="100%" blockWidth={20} />
+              </IconWrapper>
+            </Badge>
           )}
 
           <Popover

@@ -1,3 +1,4 @@
+import { useAppSelector } from 'hooks/redux';
 import { FC, memo } from 'react';
 
 interface ProductOverviewProps {
@@ -5,7 +6,14 @@ interface ProductOverviewProps {
 }
 
 const ProductOverview: FC<ProductOverviewProps> = ({ id }) => {
-  return <div>ProductOverview</div>;
+  const { laptopDetail } = useAppSelector((state) => state.laptop);
+  return (
+    <div className="render-html">
+      <section
+        dangerouslySetInnerHTML={{ __html: String(laptopDetail?.review) }}
+      />
+    </div>
+  );
 };
 
 export default memo(ProductOverview);

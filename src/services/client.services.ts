@@ -7,6 +7,7 @@ import {
   CommentList,
   CommentListResponse,
   CommentResponse,
+  CommentReturnExtend,
   CommentWithoutId,
   CreateNewAccountBody,
   CreateNewAccountDataResponse,
@@ -24,6 +25,7 @@ import {
   ProvinceData,
   ProvinceResponse,
   Receipt,
+  UpdateProfileBody,
   WardData,
   WardResponse
 } from './client.interface';
@@ -187,5 +189,37 @@ export const deleteCommentById = async (
     `/api/laptop/comment/${commentId}`,
     { data: params }
   );
+  return response.data.data;
+};
+
+export const avatarUpload = async (data: FormData): Promise<string> => {
+  const response: AxiosResponse<string> = await request.post(
+    `/api/profile/avatar-upload`,
+    data,
+    {
+      headers: {
+        'Content-type': 'multipart/form-data'
+      }
+    }
+  );
+
+  return response.data;
+};
+
+export const updateProfile = async (body: UpdateProfileBody, userID: string) =>
+  request.put(`/api/profile/${userID}`, body);
+
+export const getProfile = async (profileID: string) => {
+  const response: AxiosResponse<Profiles> = await request.get(
+    `/api/profile/${profileID}`
+  );
+  return response.data;
+};
+
+export const getCommentRatingMoreThan4 = async (): Promise<
+  CommentReturnExtend[]
+> => {
+  const response: AxiosResponse<{ data: CommentReturnExtend[] }> =
+    await request.get(`/api/comment/more-than-4`);
   return response.data.data;
 };

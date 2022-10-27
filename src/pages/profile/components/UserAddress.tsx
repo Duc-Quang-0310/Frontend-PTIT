@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Select, Steps } from 'antd';
+import { notification, Select, Steps } from 'antd';
 import ButtonUI from 'components/Button/ButtonUI';
 import InputUI from 'components/Input/InputUI';
 import {
@@ -9,11 +9,13 @@ import {
 import {
   getDistrictActionRequest,
   getProvinceActionRequest,
-  getWardActionRequest
+  getWardActionRequest,
+  setProfile
 } from 'global/common/auth/auth.slice';
 import { useAppDispatch, useAppSelector } from 'hooks/redux';
 import { FC, useState, useCallback, useEffect, memo } from 'react';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { getProfile, updateProfile } from 'services/client.services';
 import {
   InfoTitle,
   RightContentWrapper,
@@ -23,10 +25,12 @@ import {
 const { Step } = Steps;
 const { Option } = Select;
 
-const UserAddress: FC = () => {
+const UserAddress: FC<{
+  imageUrl: string;
+}> = ({ imageUrl }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const dispatch = useAppDispatch();
-  const { province, district, ward, profile } = useAppSelector(
+  const { province, district, ward, profile, user } = useAppSelector(
     (store) => store.auth
   );
 
@@ -50,9 +54,27 @@ const UserAddress: FC = () => {
   const provinceWatch = watch('province');
   const districtWatch = watch('district');
 
-  const updateInfo = useCallback((value: any) => {
-    //
-  }, []);
+  const updateInfo = useCallback(
+    async (value: any) => {
+      try {
+        if (user && imageUrl && profile) {
+          const data = {
+            ...value,
+            avatar: imageUrl,
+            updatedAt: new Date().toISOString(),
+            dob: ''
+          };
+          await updateProfile(data, user?._id);
+          notification.success({ message: 'Cập nhật thông tin thành công' });
+          const res = await getProfile(profile._id);
+          dispatch(setProfile(res));
+        }
+      } catch (error) {
+        notification.error({ message: 'Cập nhật thông tin thất bại' });
+      }
+    },
+    [dispatch, imageUrl, profile, user]
+  );
 
   useEffect(() => {
     dispatch(getProvinceActionRequest());
@@ -78,6 +100,19 @@ const UserAddress: FC = () => {
       setValue('district', profile?.district || '');
       setValue('ward', profile?.ward || '');
       setValue('address', profile?.address || '');
+
+      if (profile?.province) {
+        setCurrentStep(1);
+      }
+      if (profile?.district) {
+        setCurrentStep(2);
+      }
+      if (profile?.ward) {
+        setCurrentStep(3);
+      }
+      if (profile?.address) {
+        setCurrentStep(4);
+      }
     }
   }, [profile, setValue]);
 

@@ -318,6 +318,10 @@ export const authSlice = createSlice({
       ...state,
       internalLoading: false,
       receipts: action.payload
+    }),
+    setProfile: (state: AuthState, action: PayloadAction<Profiles>) => ({
+      ...state,
+      profile: action.payload
     })
   }
 });
@@ -347,7 +351,8 @@ export const {
   changePasswordActionRequest,
   changePasswordActionComplete,
   getAllReceiptsRequest,
-  getAllReceiptsComplete
+  getAllReceiptsComplete,
+  setProfile
 } = authSlice.actions;
 
 export default authSlice.reducer;

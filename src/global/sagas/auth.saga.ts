@@ -53,7 +53,7 @@ function* createNewAccountActionSaga(
   action: PayloadAction<CreateNewAccountBody>
 ) {
   try {
-    yield put(resetAuthState());
+    yield put(clearErr());
 
     const { onComplete, ...other } = action.payload;
 

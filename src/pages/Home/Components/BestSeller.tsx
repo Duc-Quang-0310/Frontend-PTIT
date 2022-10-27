@@ -66,7 +66,12 @@ const BestSeller: FC = () => {
           <Col
             key={`${price}${productLink}${title}${index}`}
             xxl={6}
-            style={{ marginTop: 30, cursor: 'pointer' }}
+            style={{
+              marginTop: 30,
+              cursor: 'pointer',
+              width: '90%',
+              marginInline: 'auto'
+            }}
           >
             <ProductCard
               price={price}

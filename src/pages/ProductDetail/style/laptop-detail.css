@@ -1,0 +1,8 @@
+.render-html img {
+    width: 100%;
+    object-fit: contain;
+}
+
+.render-html .ddnb-title spct-title {
+    margin-bottom: 10px !important;
+}

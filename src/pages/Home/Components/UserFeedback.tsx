@@ -1,20 +1,17 @@
 import { Col, Row } from 'antd';
 import CommentCard from 'components/commentCard/CommentCard';
 import { Logo } from 'components/Images/Logo';
-import { FC, memo } from 'react';
+import { useCommentRating } from 'hooks/useCommentRating';
+import { FC, memo, useMemo } from 'react';
 import { UserFeedBackContainer } from '../style/UserFeedback';
 import '../style/UserFeedback.css';
 
 const UserFeedback: FC = () => {
-  return (
-    <UserFeedBackContainer key="UserFeedBackContainer">
-      <p>3940+ Người dùng đã mua sản phẩm</p>
-      <h2>
-        Hãy nghe đánh giá của khách hàng trước khi
-        <br /> trải nghiệm dịch vụ tại{' '}
-        <Logo blockHeight={30} blockWidth={200} />
-      </h2>
-      <Row>
+  const { sortedComment, loading } = useCommentRating();
+
+  const DEFAULT_VALUE = useMemo(
+    () => (
+      <>
         <Col xxl={10} xl={12} lg={24} className="user-feedback">
           <CommentCard
             authorName="Jenny Wilson"
@@ -38,6 +35,38 @@ const UserFeedback: FC = () => {
             disableStar
           />
         </Col>
+      </>
+    ),
+    []
+  );
+
+  return (
+    <UserFeedBackContainer key="UserFeedBackContainer">
+      <p>3940+ Người dùng đã mua sản phẩm</p>
+      <h2>
+        Hãy nghe đánh giá của khách hàng trước khi
+        <br /> trải nghiệm dịch vụ tại{' '}
+        <Logo blockHeight={30} blockWidth={200} />
+      </h2>
+      <Row style={{ justifyContent: 'space-evenly' }}>
+        {sortedComment.length && !loading
+          ? sortedComment.map((comment) => (
+              <Col
+                xxl={10}
+                xl={12}
+                lg={24}
+                className="user-feedback"
+                key={comment.id}
+              >
+                <CommentCard
+                  authorName={comment.authorName}
+                  content={comment.content}
+                  userAvatar={comment.userAvatar}
+                  starRate={comment.starRate}
+                />
+              </Col>
+            ))
+          : DEFAULT_VALUE}
       </Row>
     </UserFeedBackContainer>
   );

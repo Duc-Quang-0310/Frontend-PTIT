@@ -1,8 +1,6 @@
 import { Result } from 'antd';
 import ButtonUI from 'components/Button/ButtonUI';
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { routerPaths } from 'router/router.paths';
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -14,7 +12,7 @@ const NotFound = () => {
       extra={
         <ButtonUI
           type="primary"
-          onClick={() => navigate(routerPaths.HOME)}
+          onClick={() => navigate('/')}
           content="Về trang chủ"
           style={{ marginInline: 'auto' }}
         />
